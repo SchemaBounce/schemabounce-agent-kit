@@ -1,0 +1,15 @@
+{
+  "name": "schemabounce-agent-kit",
+  "description": "SchemaBounce's agent kit for Claude Code: decision records just in time, from the hosted SchemaBounce MCP.",
+  "owner": { "name": "SchemaBounce", "email": "support@schemabounce.com", "url": "https://schemabounce.com" },
+  "plugins": [
+    {
+      "name": "schemabounce",
+      "source": "./",
+      "description": "Find, cite and propose SchemaBounce decisions from the files you are changing.",
+      "version": "0.1.0",
+      "category": "development",
+      "tags": ["schemabounce", "decisions", "governance", "mcp"]
+    }
+  ]
+}
