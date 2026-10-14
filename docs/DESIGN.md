@@ -1,7 +1,7 @@
 # SchemaBounce agent kit: design
 
-Status: draft, 2026-10-14. The governing decision is proposed in the SchemaBounce
-decision plane (see "Decision" below); read its status before relying on it.
+Status: governed by dec-125, accepted 2026-10-14 21:06Z by the founder (see
+"Decision" below). The record is the authority; read it before relying on this.
 
 ## What this is for
 
@@ -174,11 +174,12 @@ refines dec-081 clause 5 and needs the decision below.
 
 ## Decision
 
-Proposed in the decision plane, 2026-10-14 (see the record for its id and
-status): classification index beside immutable decisions; current authority
-and consolidation as above; one public agent kit as the single source for
-every agent surface; the platform loads it, pinned, in every hosted code
-session.
+dec-125, accepted 2026-10-14 21:06Z: classification index beside immutable
+decisions; current authority and consolidation as above; server-assigned ids;
+one public agent kit as the single source for every agent surface; the
+platform loads it, pinned, in every hosted code session (refining dec-081
+clause 5 for this kit only). Work is tracked as task_kit_00 to task_kit_09 on
+the SchemaBounce board.
 
 ## Phases
 
