@@ -47,6 +47,9 @@ This kit gives every agent the same behaviour from one source:
 - Agents allocate `dec-NNN` by reading the maximum and adding one. Two
   sessions did this on 2026-10-14 and one proposal was overwritten (dec-119,
   restored by hand), because proposed-to-proposed edits are open.
+  The `propose` action (task_kit_01_propose_server_id, core-api `development`,
+  not promoted) closes this: the server assigns the id and a proposed record
+  is editable only by its proposer or a holder of `adl:decide`.
 
 ## Model
 

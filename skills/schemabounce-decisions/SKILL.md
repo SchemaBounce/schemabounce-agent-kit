@@ -31,7 +31,9 @@ the bug.
 5. **Read status, never remember it.** A person accepts or rejects a proposal
    whenever they like and nothing tells you. Read the record in the same turn
    before you state its status or ask anyone to ratify it.
-6. **Propose, never ratify.** You may record a proposal. Only a person with
+6. **Propose, never ratify.** You may record a proposal (with the `sb_decision`
+   propose action, which assigns the id; see
+   [references/proposing.md](references/proposing.md)). Only a person with
    ratification authority accepts or rejects one. Never write `accepted`,
    `rejected` or `superseded` yourself; the server refuses it anyway.
 7. **Accepted decisions never change.** A correction is a new proposal whose
@@ -40,8 +42,10 @@ the bug.
 
 ## Finding the decisions that apply (version 0)
 
-The just-in-time `sb_decision` tool described in this kit's design is not
-live yet. Until it is, use the hosted MCP's `sb_adl` tool and keep results
+The just-in-time lookup actions of the `sb_decision` tool described in this
+kit's design (context, search, get, lineage) are not live yet. Only its
+`propose` action is built, and production does not have it until the next
+release. For lookups, use the hosted MCP's `sb_adl` tool and keep results
 small:
 
 1. **Known ids**: `sb_adl` `records_get` with `entity_type: "decision"` and
