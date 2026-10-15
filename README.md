@@ -32,6 +32,10 @@ Add the SchemaBounce marketplace once, then install the plugin:
 
 Then sign in to the SchemaBounce MCP with `/mcp`.
 
+On a machine without a GitHub SSH key, set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1`
+in your shell before installing or updating: the in-session install and
+`claude plugin update` do not fall back to HTTPS on their own.
+
 The marketplace at [SchemaBounce/claude-plugins](https://github.com/SchemaBounce/claude-plugins)
 pins a release tag of this repository, so an install is a reviewed release.
 This repository is also its own marketplace (`schemabounce@schemabounce-agent-kit`),
