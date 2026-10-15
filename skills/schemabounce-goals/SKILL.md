@@ -4,7 +4,7 @@ description: Use when you create, change, measure or report on a SchemaBounce go
 compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that owns the goals. Reading needs view access. Declaring a metric, capturing a snapshot and creating or changing a goal are writes and need write access. Hosted Code Mode sessions have it read-only.
 metadata:
   kit: schemabounce-agent-kit
-  version: 0.3.0
+  version: 0.4.0
 ---
 
 # SchemaBounce goals and outcome metrics

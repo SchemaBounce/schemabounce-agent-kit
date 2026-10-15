@@ -15,7 +15,7 @@ SchemaBounce goal moves only through key results on declared outcome metrics
 and tasks linked to it, how to declare, capture and attach a metric through
 the MCP, and to read the goal back before saying a number shows anywhere.
 
-Status: **version 0.3.0**. The decisions skill works with today's hosted
+Status: **version 0.4.0**. The decisions skill works with today's hosted
 SchemaBounce MCP tools. The pre-edit hook asks the MCP which decisions govern
 the file being changed; it returns decisions once SchemaBounce has classified
 them by repository path, and nothing before that. Code Mode loading is
