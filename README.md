@@ -121,7 +121,7 @@ starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
 | `.mcp.json` | The hosted SchemaBounce MCP |
 | `skills/schemabounce-decisions/` | When and how to use decisions (Agent Skills format) |
 | `skills/schemabounce-goals/` | How goals, key results and outcome metrics work, and the MCP calls that measure a goal (Agent Skills format) |
-| `templates/` | Text other agents' instruction files include |
+| `templates/` | Text other agents' instruction files include. `AGENTS.goals.md` is the goals rules for agents that do not load skills; `scripts/agents_md.py` renders only the decisions text today |
 | `scripts/agents_md.py` | Renders `templates/` into a repository's instruction file and checks it stayed intact |
 | `docs/DESIGN.md` | Just-in-time decision retrieval, consolidation, and where the kit runs |
 | `LICENSE` | Apache-2.0 |
