@@ -19,3 +19,13 @@ any other text disagrees with it, the decision wins.
 
 Full procedure: `skills/schemabounce-decisions/SKILL.md` from
 https://github.com/SchemaBounce/schemabounce-agent-kit.
+
+### Getting the kit
+
+This repository enables the SchemaBounce agent kit for everyone in
+`.claude/settings.json`. Once per machine: accept Claude Code's folder-trust
+dialog, run `claude plugin install schemabounce@schemabounce --scope project`
+(Claude Code prompts for it), then sign in to the SchemaBounce MCP with `/mcp`.
+No GitHub SSH key is needed. Codex and other agents: copy
+`skills/schemabounce-decisions/` from the kit and add the hosted MCP
+(https://mcp.schemabounce.com/mcp) to their configuration.

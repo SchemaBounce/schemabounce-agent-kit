@@ -1,7 +1,7 @@
 {
   "name": "schemabounce",
   "displayName": "SchemaBounce agent kit",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "license": "Apache-2.0",
   "description": "Just-in-time SchemaBounce decision records for coding agents: find the rulings that govern a change, cite them, and propose new ones without ratifying.",
   "author": {

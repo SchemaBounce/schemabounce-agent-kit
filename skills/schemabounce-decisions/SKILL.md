@@ -4,7 +4,7 @@ description: Use when a task touches architecture, pricing, security, licensing,
 compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that holds the decisions. Hosted Code Mode sessions have it read-only.
 metadata:
   kit: schemabounce-agent-kit
-  version: 0.4.1
+  version: 0.4.2
 ---
 
 # SchemaBounce decisions
