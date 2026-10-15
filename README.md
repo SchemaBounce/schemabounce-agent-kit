@@ -123,8 +123,11 @@ starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
 
 A release is a version bump in `.claude-plugin/plugin.json` and the
 marketplace entry, an immutable tag `schemabounce--v<version>`, and a GitHub
-release with a zip of this folder and its sha256. The SchemaBounce marketplace
-points at the tag. To update: `claude plugin update schemabounce@schemabounce`.
+release with two `git archive` assets of this folder under one top-level
+directory, each with its sha256: a `.tar.gz`, which hosted Code Mode pins and
+verifies before it extracts, and a `.zip` for people. The SchemaBounce
+marketplace points at the tag. To update:
+`claude plugin update schemabounce@schemabounce`.
 
 ## Security
 
