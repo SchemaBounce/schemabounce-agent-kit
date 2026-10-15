@@ -5,7 +5,7 @@ check that it is still there and unchanged.
 The block lives between two HTML comments, so it survives next to hand-written
 text and a regenerated mirror alike:
 
-    <!-- schemabounce-agent-kit:decisions start kit=0.2.1 sha256=... -->
+    <!-- schemabounce-agent-kit:decisions start kit=0.3.0 sha256=... -->
     ## SchemaBounce decisions
     ...
     <!-- schemabounce-agent-kit:decisions end -->
@@ -24,8 +24,9 @@ Commands (run with python3, no third-party packages):
 
     agents_md.py check-settings <settings.json>
         Fails when a Claude Code settings file does not enable the kit:
-        extraKnownMarketplaces.schemabounce-agent-kit pointing at this
-        repository and enabledPlugins["schemabounce@schemabounce-agent-kit"].
+        extraKnownMarketplaces.schemabounce pointing at the SchemaBounce
+        marketplace (SchemaBounce/claude-plugins) and
+        enabledPlugins["schemabounce@schemabounce"].
 
 A repository keeps a copy of this file (scripts/check-agent-kit.py) so its
 pre-commit hook can run check and check-settings without the kit checkout.
@@ -45,8 +46,9 @@ import sys
 from pathlib import Path
 
 KIT_NAME = "schemabounce-agent-kit"
-PLUGIN_ID = "schemabounce@schemabounce-agent-kit"
-KIT_REPO = "SchemaBounce/schemabounce-agent-kit"
+PLUGIN_ID = "schemabounce@schemabounce"
+MARKETPLACE_NAME = "schemabounce"
+MARKETPLACE_REPO = "SchemaBounce/claude-plugins"
 BLOCK_ID = f"{KIT_NAME}:decisions"
 START_RE = re.compile(
     rf"^<!-- {re.escape(BLOCK_ID)} start kit=(?P<kit>[^ ]+) sha256=(?P<sha>[0-9a-f]{{64}}) -->$"
@@ -159,12 +161,12 @@ def cmd_check_settings(path: Path) -> int:
         return fail(f"{path} does not exist")
     with path.open(encoding="utf-8") as handle:
         settings = json.load(handle)
-    marketplace = (settings.get("extraKnownMarketplaces") or {}).get(KIT_NAME) or {}
+    marketplace = (settings.get("extraKnownMarketplaces") or {}).get(MARKETPLACE_NAME) or {}
     source = marketplace.get("source") or {}
-    if source.get("source") != "github" or source.get("repo") != KIT_REPO:
+    if source.get("source") != "github" or source.get("repo") != MARKETPLACE_REPO:
         return fail(
-            f"{path}: extraKnownMarketplaces.{KIT_NAME} must be "
-            f'{{"source": {{"source": "github", "repo": "{KIT_REPO}"}}}}'
+            f"{path}: extraKnownMarketplaces.{MARKETPLACE_NAME} must be "
+            f'{{"source": {{"source": "github", "repo": "{MARKETPLACE_REPO}"}}}}'
         )
     if (settings.get("enabledPlugins") or {}).get(PLUGIN_ID) is not True:
         return fail(f'{path}: enabledPlugins["{PLUGIN_ID}"] must be true')

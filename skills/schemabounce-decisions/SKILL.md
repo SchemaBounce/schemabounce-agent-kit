@@ -4,7 +4,7 @@ description: Use before changing anything a SchemaBounce decision may govern (ar
 compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that holds the decisions. Hosted Code Mode sessions have it read-only.
 metadata:
   kit: schemabounce-agent-kit
-  version: 0.2.1
+  version: 0.3.0
 ---
 
 # SchemaBounce decisions
