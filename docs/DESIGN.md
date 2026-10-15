@@ -229,7 +229,7 @@ is open (see "Open checks").
 
 | Surface | How the kit arrives | Just-in-time context |
 |---|---|---|
-| Local Claude Code | Each repo checks in `.claude/settings.json` with this marketplace and `schemabounce@schemabounce-agent-kit` enabled; the marketplace entry pins the version | Hooks before edits; the skill at task start |
+| Local Claude Code | Each repo checks in `.claude/settings.json` with the SchemaBounce marketplace (`SchemaBounce/claude-plugins`, name `schemabounce`) and `schemabounce@schemabounce` enabled; the marketplace entry pins a release tag of this repo. This repo's own marketplace entry is the development channel. Anthropic's directory lists the same release for everyone else | Hooks before edits; the skill at task start |
 | Hosted Code Mode | The platform fetches this plugin at a pinned digest and loads it into every session as a platform plugin (Agent SDK `plugins: [{type: "local"}]`), outside the repository | Core-api adds the repo digest to the session's start context; hooks before edits; read-only `sb_decision` |
 | Codex and other agents | `AGENTS.md` and the Agent Skills files, generated into each repo from this kit; MCP configured in their own config | The skill; `context` called explicitly |
 | SchemaBounce agents | Native decision tools in the runtime; the decision rule deployed as a workspace rule | Same `context` call |

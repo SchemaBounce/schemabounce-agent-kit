@@ -5,11 +5,12 @@ it. In a hosted Code Mode session you cannot record; put the proposal in your
 final message instead.
 
 Two ways exist. Use the propose action when the workspace has it. Use the
-fallback only until it does.
+fallback only when the tool is absent.
 
 ## Preferred: the propose action
 
-`sb_decision` with `action: "propose"` (dec-125 clause 6). The server picks the
+`sb_decision` with `action: "propose"` (decision dec-125, if you can read
+it). The server picks the
 next `dec-NNN` id in one transaction, stamps you as the proposer, and can never
 overwrite an existing record. Two proposals made at the same moment get two ids.
 
@@ -32,12 +33,11 @@ is refused and the error names the propose action.
 How to tell the workspace has it: `sb_decision` appears in the MCP tool list.
 If it does not, use the fallback below.
 
-## Fallback until production has the propose action
+## Fallback when the `sb_decision` tool is absent
 
-Nothing here is promoted yet: as of this version the hosted production MCP has
-no `sb_decision` tool. Until it does, ids are chosen by the writer and an
-existing **proposed** record can be overwritten by a write to the same id. On
-2026-10-14 one session overwrote another's proposal this way.
+Without the propose action, ids are chosen by the writer and an existing
+**proposed** record can be overwritten by a write to the same id, so check
+before every write.
 
 ### Choosing the id safely
 
