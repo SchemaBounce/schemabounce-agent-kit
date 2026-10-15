@@ -15,7 +15,7 @@ SchemaBounce goal moves only through key results on declared outcome metrics
 and tasks linked to it, how to declare, capture and attach a metric through
 the MCP, and to read the goal back before saying a number shows anywhere.
 
-Status: **version 0.4.0**. The decisions skill works with today's hosted
+Status: **version 0.4.1**. The decisions skill works with today's hosted
 SchemaBounce MCP tools. The pre-edit hook asks the MCP which decisions govern
 the file being changed; it returns decisions once SchemaBounce has classified
 them by repository path, and nothing before that. Code Mode loading is
@@ -115,6 +115,8 @@ starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
   context. The hook never blocks an edit.
 - **Access:** the MCP server needs each person's own SchemaBounce sign-in and
   returns only what that person may read.
+- **Platforms:** any system Claude Code runs on. `scripts/agents_md.py` is
+  optional and needs Python 3, nothing else.
 
 ## What is inside
 

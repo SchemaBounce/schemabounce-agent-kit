@@ -1,8 +1,9 @@
 # Measuring a goal through the hosted MCP
 
 Every call below is an action of a hosted SchemaBounce MCP tool as it works
-today. Steps 4, 5 and 6 are writes: make them when the person you work for
-asks or agrees.
+today. Steps 4, 5 and 6 are writes (`outcome_declare`, `outcome_snapshot`,
+`goal_update`, and any `goal_create`): make them only when the person you work
+for asks or agrees.
 
 ## Two meanings of "domain"
 
@@ -64,7 +65,7 @@ declaring the same key again updates it.
 | `metric_direction` | yes | `up` or `down`: which way is good. |
 | `metric_attribution_caveat_class` | yes | `direct_sla`, `confounded_market` or `mixed`: how strongly the work can be said to have caused a change. |
 | `metric_label`, `metric_unit`, `metric_description` | no | What people read. |
-| `metric_attribution_window` | no | `<n>h`, `<n>d` or `<n>w`. Default `30d`. The query reads records from this window (at most 90 days), so a summary record must be newer than it. |
+| `metric_attribution_window` | no | `<n>h`, `<n>d` or `<n>w`. Default `30d`. The query only reads records created within this window (at most 90 days), so the latest summary record must fall inside it. |
 | `metric_agent_refs`, `metric_workflow_refs` | no | Who the metric is declared for. Empty means workspace level. |
 | `metric_target` | no | A default only; the key result owns the target. |
 
@@ -77,8 +78,10 @@ result on it reads `unresolved`.
 ## 6. Attach it to the goal (write)
 
 `sb_metrics` `goal_update` with `goal_id` and
-`goal: {"keyResults": [...]}`. The list **replaces** the goal's key results,
-so send the existing ones too. Each entry:
+`goal: {"keyResults": [...]}`. The list **replaces** the goal's key results:
+first `goal_get`, copy every existing entry from `keyResults`, append the new
+one, and send the full list. Sending only the new entry deletes the others.
+Each entry:
 
 ```json
 {"metricDeclarationId": "<metric_key>", "targetValue": 10, "direction": "up"}
@@ -94,9 +97,10 @@ metric, and the progress or `unresolved` reason the server returned. If the
 key result is missing, say the attach failed. Never report a number the read
 did not return.
 
-## Worked example
+## Worked example (illustrative only)
 
-A team tracks search rankings for twelve keywords. Each weekly run already
+Use your own record types and keys; nothing here is required wording. A team
+tracks search rankings for twelve keywords. Each weekly run already
 writes one record per keyword. To measure "keywords in the top 20":
 
 1. Have each run also write one `rank_summary` record with

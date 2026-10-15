@@ -5,7 +5,7 @@ check that it is still there and unchanged.
 The block lives between two HTML comments, so it survives next to hand-written
 text and a regenerated mirror alike:
 
-    <!-- schemabounce-agent-kit:decisions start kit=0.3.0 sha256=... -->
+    <!-- schemabounce-agent-kit:decisions start kit=<version> sha256=... -->
     ## SchemaBounce decisions
     ...
     <!-- schemabounce-agent-kit:decisions end -->
