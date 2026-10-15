@@ -7,7 +7,7 @@
       "name": "schemabounce",
       "source": "./",
       "description": "Find, cite and propose SchemaBounce decisions from the files you are changing.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "category": "development",
       "tags": ["schemabounce", "decisions", "governance", "mcp"]
     }

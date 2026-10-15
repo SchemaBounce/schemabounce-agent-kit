@@ -10,7 +10,7 @@ helps an agent find the rulings that govern the change in front of it, cite
 them, stop when a change contradicts one, and propose new ones without
 ratifying them.
 
-Status: **version 0.2.0**. The decisions skill works with today's hosted
+Status: **version 0.2.1**. The decisions skill works with today's hosted
 SchemaBounce MCP tools. The just-in-time retrieval, hooks and Code Mode
 loading described in [docs/DESIGN.md](docs/DESIGN.md) come in later phases.
 
@@ -39,12 +39,31 @@ repository's `.claude/settings.json`:
 }
 ```
 
+Then render the kit's decisions text into the repository's instruction file
+and keep the check in the repository's pre-commit hook, so the text is never
+typed in by hand and a commit that drops or edits it fails:
+
+```
+python3 scripts/agents_md.py render /path/to/repo/AGENTS.md
+python3 scripts/agents_md.py check /path/to/repo/AGENTS.md
+python3 scripts/agents_md.py check-settings /path/to/repo/.claude/settings.json
+```
+
+`render` writes [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md)
+between two marker comments that record the kit version and a hash;
+`--before "## Some heading"` places a new block above that heading. A
+repository that has no kit checkout beside it keeps a copy of the script as
+`scripts/check-agent-kit.py` for the two `check` commands. When a file is
+generated from another (a Codex mirror from `CLAUDE.md`), render into the
+source and regenerate the mirror.
+
 ## Codex and other agents
 
-Copy [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into the
-repository's `AGENTS.md`, copy `skills/schemabounce-decisions/` into the
-directory your agent reads skills from, and add the hosted MCP
-(`https://mcp.schemabounce.com/mcp`) to the agent's MCP configuration.
+Render [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into the
+repository's `AGENTS.md` with the script above, copy
+`skills/schemabounce-decisions/` into the directory your agent reads skills
+from, and add the hosted MCP (`https://mcp.schemabounce.com/mcp`) to the
+agent's MCP configuration.
 
 ## Hosted Code Mode
 
@@ -61,6 +80,7 @@ repository to the session's starting context.
 | `.mcp.json` | The hosted SchemaBounce MCP |
 | `skills/schemabounce-decisions/` | When and how to use decisions (Agent Skills format) |
 | `templates/` | Text other agents' instruction files include |
+| `scripts/agents_md.py` | Renders `templates/` into a repository's instruction file and checks it stayed intact |
 | `docs/DESIGN.md` | Just-in-time decision retrieval, consolidation, and where the kit runs |
 
 ## Security
