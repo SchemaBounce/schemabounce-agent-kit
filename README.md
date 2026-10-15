@@ -10,6 +10,11 @@ helps an agent find the rulings that govern the change in front of it, cite
 them, stop when a change contradicts one, and propose new ones without
 ratifying them.
 
+The second part is **goals and outcome metrics**. It teaches an agent that a
+SchemaBounce goal moves only through key results on declared outcome metrics
+and tasks linked to it, how to declare, capture and attach a metric through
+the MCP, and to read the goal back before saying a number shows anywhere.
+
 Status: **version 0.3.0**. The decisions skill works with today's hosted
 SchemaBounce MCP tools. The pre-edit hook asks the MCP which decisions govern
 the file being changed; it returns decisions once SchemaBounce has classified
@@ -71,8 +76,8 @@ source and regenerate the mirror.
 
 Render [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into the
 repository's `AGENTS.md` with the script above, copy
-`skills/schemabounce-decisions/` into the directory your agent reads skills
-from, and add the hosted MCP (`https://mcp.schemabounce.com/mcp`) to the
+`skills/schemabounce-decisions/` and `skills/schemabounce-goals/` into the
+directory your agent reads skills from, and add the hosted MCP (`https://mcp.schemabounce.com/mcp`) to the
 agent's MCP configuration.
 
 ## Hosted Code Mode
@@ -86,6 +91,7 @@ starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
 | Part | Claude Code | Cowork | claude.ai chat |
 |---|---|---|---|
 | Skill `schemabounce-decisions` | Loads | Loads | Loads |
+| Skill `schemabounce-goals` | Loads | Loads | Loads |
 | Pre-edit hook | Loads | Loads | Not loaded (chat has no hooks) |
 | Hosted SchemaBounce MCP | Loads | Connect it from the plugin's Connectors tab | Connect it from the plugin's Connectors tab |
 
@@ -114,6 +120,7 @@ starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
 | `hooks/hooks.json` | Before an edit, asks the MCP which decisions govern the file (see DESIGN.md, "The edit hook") |
 | `.mcp.json` | The hosted SchemaBounce MCP |
 | `skills/schemabounce-decisions/` | When and how to use decisions (Agent Skills format) |
+| `skills/schemabounce-goals/` | How goals, key results and outcome metrics work, and the MCP calls that measure a goal (Agent Skills format) |
 | `templates/` | Text other agents' instruction files include |
 | `scripts/agents_md.py` | Renders `templates/` into a repository's instruction file and checks it stayed intact |
 | `docs/DESIGN.md` | Just-in-time decision retrieval, consolidation, and where the kit runs |
