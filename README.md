@@ -76,6 +76,18 @@ repository that has no kit checkout beside it keeps a copy of the script as
 generated from another (a Codex mirror from `CLAUDE.md`), render into the
 source and regenerate the mirror.
 
+The checked-in settings register the marketplace for everyone who trusts the
+folder. Because the entry points at the plugin's own repository, each
+contributor installs it once per machine, which Claude Code also prompts for:
+
+```
+claude plugin install schemabounce@schemabounce --scope project
+```
+
+Then sign in to the SchemaBounce MCP once with `/mcp`. Hosted and cloud
+sessions never load a repository's plugins; SchemaBounce's hosted Code Mode
+loads the kit from a platform pin instead.
+
 ## Codex and other agents
 
 Render [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into the
