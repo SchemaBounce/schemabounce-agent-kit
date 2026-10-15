@@ -139,8 +139,9 @@ marketplace entry, an immutable tag `schemabounce--v<version>`, and a GitHub
 release with two `git archive` assets of this folder under one top-level
 directory, each with its sha256: a `.tar.gz`, which hosted Code Mode pins and
 verifies before it extracts, and a `.zip` for people. The SchemaBounce
-marketplace points at the tag. To update:
-`claude plugin update schemabounce@schemabounce`.
+marketplace points at the tag, and `main` holds the released state: a person
+merges `development` into `main` at each release, so `main` and the newest tag
+match. To update: `claude plugin update schemabounce@schemabounce`.
 
 ## Security
 
