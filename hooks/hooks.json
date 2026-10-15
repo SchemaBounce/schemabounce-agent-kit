@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "plugin:schemabounce:schemabounce",
+            "tool": "sb_decision",
+            "input": {
+              "action": "context",
+              "format": "claude_code_hook",
+              "cwd": "${cwd}",
+              "file_path": "${tool_input.file_path}"
+            },
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

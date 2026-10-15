@@ -4,7 +4,7 @@ description: Use before changing anything a SchemaBounce decision may govern (ar
 compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that holds the decisions. Hosted Code Mode sessions have it read-only.
 metadata:
   kit: schemabounce-agent-kit
-  version: 0.1.0
+  version: 0.2.0
 ---
 
 # SchemaBounce decisions
@@ -40,12 +40,25 @@ the bug.
    `supersedes` lists the old id. Merging several similar decisions works the
    same way: one proposal that supersedes all of them.
 
+## The edit hook, and when to call `context` yourself
+
+This plugin ships a `PreToolUse` hook on `Edit`, `Write` and `MultiEdit`. Before
+each edit it asks the SchemaBounce MCP which accepted decisions govern the file
+and adds them to your context, with their ids. When you see them, follow and
+cite them. When nothing appears, the file has no classified decision, or the
+MCP is signed out or unreachable: the hook fails quietly, so silence is not
+proof that nothing applies.
+
+The hook does not run at session start, and it sees one file at a time. Call
+`sb_decision` `context` yourself (`repository`, `paths`, optional `topics`
+and `query`) at **task start** with the files you expect to touch, and again
+**before you write a plan** that changes governed things. Use `budget_tokens`
+to cap the answer and `cursor` to page when `more` is set.
+
 ## Finding the decisions that apply (version 0)
 
-The just-in-time lookup actions of the `sb_decision` tool described in this
-kit's design (context, search, get, lineage) are not live yet. Only its
-`propose` action is built, and production does not have it until the next
-release. For lookups, use the hosted MCP's `sb_adl` tool and keep results
+The `context`, `search`, `get` and `lineage` actions of `sb_decision` are built
+but may not be in production yet. If the tool or action is missing, for lookups, use the hosted MCP's `sb_adl` tool and keep results
 small:
 
 1. **Known ids**: `sb_adl` `records_get` with `entity_type: "decision"` and

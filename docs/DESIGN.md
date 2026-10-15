@@ -156,12 +156,74 @@ Patterns used, verified against the Claude Code documentation on 2026-10-14:
 - **Skills** follow the open Agent Skills format (name and description
   frontmatter, body loaded on use, references loaded on demand), so the same
   files serve Claude Code and other agents.
-- **Hooks** (phase 2) call the MCP directly with `type: "mcp_tool"` on
-  `PreToolUse` for `Edit|Write|MultiEdit`, passing the file path, and return
-  the cards as `additionalContext` (10,000-character cap, phrased as facts).
-  `mcp_tool` hooks are skipped at session start, so start-of-session context
-  comes from the platform (Code Mode) or the skill (local).
+- **Hooks** (phase 2, version 0.2.0) call the MCP directly with
+  `type: "mcp_tool"` on `PreToolUse` for `Edit|Write|MultiEdit`. See "The edit
+  hook" below. `mcp_tool` hooks are skipped at session start, so
+  start-of-session context comes from the platform (Code Mode) or the skill
+  (local).
 - **MCP tool search** keeps tool schemas deferred until used.
+
+## The edit hook
+
+`hooks/hooks.json` runs an `mcp_tool` hook before every `Edit`, `Write` and
+`MultiEdit`. It calls `sb_decision` with `action: "context"`,
+`format: "claude_code_hook"`, `cwd: "${cwd}"` and
+`file_path: "${tool_input.file_path}"`, with a 10-second timeout.
+
+Facts, verified 2026-10-15 on Claude Code 2.1.299 (experiment: a throwaway
+plugin with a 30-line stdio mock MCP server, `claude -p --plugin-dir`, never
+the production MCP) and against the docs
+(https://code.claude.com/docs/en/hooks, "MCP tool hook fields";
+https://code.claude.com/docs/en/plugins-reference):
+
+1. **A plugin hook can target the plugin's own server.** `server` must be the
+   scoped name `plugin:<plugin>:<server>` (here `plugin:schemabounce:schemabounce`),
+   not the `.mcp.json` key. Confirmed: the debug log shows
+   `mcp_tool calling plugin:schemabounce:schemabounce/sb_decision`.
+2. **Substitution** covers string values in `input` and only reads the hook's
+   JSON input: `${tool_input.file_path}` and `${cwd}` both resolved (the
+   mock received absolute paths). `${CLAUDE_PLUGIN_ROOT}` and friends are
+   documented for command hooks only. There is no git remote, repository name
+   or repository root in the hook input, and a declarative hook cannot run
+   git.
+3. **Output is parsed like command stdout.** The tool's text content must be
+   hook JSON. The mock returning a plain `{"cards": [...]}` object delivered
+   nothing to the model. The mock returning
+   `{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"..."}}`
+   put the text in the model's context before the edit. Cap: 10,000
+   characters per field (docs); over it the text is replaced by a file path
+   and a 2,000-character preview, so the server stays well under.
+4. **Failure is non-blocking.** Server not connected: the hook is skipped
+   ("not connected" warning in the debug log), the edit runs. Tool returns
+   `isError` (what a 401 looks like): non-blocking hook error, the edit runs,
+   the model sees no context. The hook never starts an OAuth flow, so the
+   person signs in from `/mcp` first. Claude Code logs the error; whether it
+   prints a one-line hook error in the transcript was not checked in an
+   interactive session.
+5. **Not at session start.** `SessionStart` and `Setup` `mcp_tool` hooks are
+   skipped, so this hook only covers edits.
+
+### Why the server shapes the answer (a command hook cannot replace it)
+
+The edit needs a repository name and a repository-relative path. Neither is in
+the hook input, and a `command` hook that could compute them cannot call the
+MCP (no login, no OAuth). So the hook passes the raw `cwd` and absolute
+`file_path`, and `sb_decision context` with `format: "claude_code_hook"` must:
+
+- find the repository by matching path segments against the repositories that
+  have applies-to patterns, and take the path below it as the relative path;
+- return the hook envelope above as the tool's text content, with the cards
+  phrased as facts and their ids, under 10,000 characters (budget from
+  `budget_tokens`);
+- return empty text when no decision governs the file, so nothing is added.
+
+Status: **this `format` option is not in core-api yet** (the `context` action
+exists on core-api `development` with `repository` and `paths`; production has
+neither). Until it ships the hook adds nothing in production. The wiring is
+proven against a mock that implements the contract above (governed file: the
+fixture decision reached the model; ungoverned file: nothing; server down and
+auth error: edit proceeds with no context). The live check against production
+is open (see "Open checks").
 
 ## Where it runs
 
@@ -203,7 +265,10 @@ the SchemaBounce board.
 
 ## Open checks
 
-- Whether an `mcp_tool` hook can target a server that a plugin provides (the
-  plugin server registers as `plugin:<plugin>:<server>`).
+- Production live check of the edit hook: needs `sb_decision` `context` with
+  `format: "claude_code_hook"` in production, a classified decision, and a
+  signed-in `/mcp`. Edit a governed file and an ungoverned one and compare.
+- Whether Claude Code prints a visible hook-error line in the transcript when
+  the MCP is signed out (logged as a non-blocking error either way).
 - How `-p` and Agent SDK sessions treat plugin trust in the hosted sandbox.
 - Which directories Codex reads skills from.
