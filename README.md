@@ -49,7 +49,8 @@ Check this into the repository's `.claude/settings.json`:
 {
   "extraKnownMarketplaces": {
     "schemabounce": {
-      "source": { "source": "github", "repo": "SchemaBounce/claude-plugins" }
+      "source": { "source": "github", "repo": "SchemaBounce/claude-plugins" },
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {
@@ -57,6 +58,10 @@ Check this into the repository's `.claude/settings.json`:
   }
 }
 ```
+
+`autoUpdate: true` makes Claude Code refresh the marketplace after the first
+message of a session and fetch a new release in the background; the new version
+loads on the next launch, or right away with `/reload-plugins`.
 
 Then render the kit's decisions text into the repository's instruction file
 and keep the check in the repository's pre-commit hook, so the text is never
