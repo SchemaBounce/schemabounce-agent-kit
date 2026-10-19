@@ -107,6 +107,32 @@ SchemaBounce loads this kit, pinned to a release, into every hosted code
 session, and adds the decisions that apply to the repository to the session's
 starting context. See [docs/DESIGN.md](docs/DESIGN.md), "Where it runs".
 
+## Code sessions started from Linear
+
+A workspace admin can let the SchemaBounce Linear app start code sessions from
+Linear issues. If you work in such a workspace through the hosted MCP
+(`sb_code_session`), you will see them in the session list:
+
+- **Recognise them.** The branch is `sb-code/<issue id>-<session>` (for
+  example `sb-code/eng-123-4f9a`), and the approval card in the Inbox reads
+  "Requested from Linear, issue ENG-123".
+- **Whose plan pays.** The platform matches the Linear requester to a workspace
+  member by verified email. A match runs on that member's own coding plan and
+  only that member approves. With no match, the session waits on a hold that
+  states its cost, and a person approves it in the Inbox.
+- **Approvals stay in SchemaBounce.** Nothing in Linear text approves a start,
+  a continue or a push. Do not try to approve for someone else through the MCP:
+  `approvals_respond` decides only as the signed-in person, after the typed
+  confirmation.
+- **Repository.** The repository comes from the Linear team's mapping. A
+  session for that issue cannot target another one.
+- **Stop.** Only the person who started the work can stop it from Linear.
+  The session can also be cancelled in SchemaBounce.
+- **Continue.** A session started from an issue can be continued from that same
+  issue only. Continue it from the MCP with `sb_code_session` `continue`.
+
+Public overview: <https://schemabounce.com/linear-app>.
+
 ## Where each part loads
 
 | Part | Claude Code | Cowork | claude.ai chat |
