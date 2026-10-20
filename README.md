@@ -15,7 +15,8 @@ SchemaBounce goal moves only through key results on declared outcome metrics
 and tasks linked to it, how to declare, capture and attach a metric through
 the MCP, and to read the goal back before saying a number shows anywhere.
 
-Status: **version 0.4.2**. The decisions skill works with today's hosted
+Development status: **version 0.4.3**. The public catalog remains on 0.4.2
+until this version is released. The decisions skill works with today's hosted
 SchemaBounce MCP tools. The pre-edit hook asks the MCP which decisions govern
 the file being changed; it returns decisions once SchemaBounce has classified
 them by repository path, and nothing before that. Code Mode loading is
@@ -93,13 +94,31 @@ Then sign in to the SchemaBounce MCP once with `/mcp`. Hosted and cloud
 sessions never load a repository's plugins; SchemaBounce's hosted Code Mode
 loads the kit from a platform pin instead.
 
-## Codex and other agents
+## Install in Codex
 
-Render [templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into the
-repository's `AGENTS.md` with the script above, copy
-`skills/schemabounce-decisions/` and `skills/schemabounce-goals/` into the
-directory your agent reads skills from, and add the hosted MCP (`https://mcp.schemabounce.com/mcp`) to the
-agent's MCP configuration.
+After the `schemabounce--v0.4.3` release is published, add the SchemaBounce
+Codex marketplace and install its pinned release:
+
+```
+codex plugin marketplace add SchemaBounce/claude-plugins
+codex plugin add schemabounce@schemabounce
+```
+
+Sign in to the hosted SchemaBounce MCP when Codex prompts you. The plugin
+includes both Agent Skills and an OAuth-configured connection to
+`https://mcp.schemabounce.com/mcp`; it never contains your credentials. Codex
+does not run the Claude-only pre-edit hook. The decisions skill calls
+`sb_decision` with the repository and paths before a governed change.
+
+For kit development, add this checkout as a local marketplace with
+`codex plugin marketplace add /path/to/schemabounce-agent-kit` and install
+`schemabounce@schemabounce-agent-kit`. This local entry tracks your checkout;
+the public marketplace pins a release tag.
+
+To make the kit's decision rules persistent in a repository, render
+[templates/AGENTS.decisions.md](templates/AGENTS.decisions.md) into its
+`AGENTS.md` with the script above. Other agents can still copy the two
+`skills/` directories and configure the hosted MCP manually.
 
 ## Hosted Code Mode
 
@@ -135,12 +154,12 @@ Public overview: <https://schemabounce.com/linear-app>.
 
 ## Where each part loads
 
-| Part | Claude Code | Cowork | claude.ai chat |
-|---|---|---|---|
-| Skill `schemabounce-decisions` | Loads | Loads | Loads |
-| Skill `schemabounce-goals` | Loads | Loads | Loads |
-| Pre-edit hook | Loads | Loads | Not loaded (chat has no hooks) |
-| Hosted SchemaBounce MCP | Loads | Connect it from the plugin's Connectors tab | Connect it from the plugin's Connectors tab |
+| Part | Claude Code | Codex | Cowork | claude.ai chat |
+|---|---|---|---|---|
+| Skill `schemabounce-decisions` | Loads | Loads | Loads | Loads |
+| Skill `schemabounce-goals` | Loads | Loads | Loads | Loads |
+| Pre-edit hook | Loads | Not loaded | Loads | Not loaded (chat has no hooks) |
+| Hosted SchemaBounce MCP | Loads | Connect with OAuth | Connect it from the plugin's Connectors tab | Connect it from the plugin's Connectors tab |
 
 ## What this plugin runs, sends and fetches
 
@@ -166,6 +185,9 @@ Public overview: <https://schemabounce.com/linear-app>.
 | Path | What it is |
 |---|---|
 | `.claude-plugin/` | Plugin manifest and this repository's own (development) marketplace entry |
+| `plugin.json` | Portable plugin manifest for Codex and other Agent Plugins hosts; explicitly disables Claude hook discovery in Codex |
+| `mcp.json` | Portable hosted MCP connection with OAuth client registration |
+| `.agents/plugins/marketplace.json` | Codex development marketplace for this checkout |
 | `hooks/hooks.json` | Before an edit, asks the MCP which decisions govern the file (see DESIGN.md, "The edit hook") |
 | `.mcp.json` | The hosted SchemaBounce MCP |
 | `skills/schemabounce-decisions/` | When and how to use decisions (Agent Skills format) |
