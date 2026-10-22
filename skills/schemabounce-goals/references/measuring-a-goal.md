@@ -7,7 +7,7 @@ for asks or agrees.
 
 ## Two meanings of "domain"
 
-- An **org-chart domain** is a team of agents and people (ids start with
+- An **org-chart domain** is a group of agents and people (ids start with
   `dom_`). A domain goal is owned by one: `ownerDomainId`.
 - An **outcome domain** is one of the ten areas in the metric catalog
   (`marketing_growth`, `revenue_sales`, `support_success`, ...). A metric
@@ -99,7 +99,7 @@ did not return.
 
 ## Worked example (illustrative only)
 
-Use your own record types and keys; nothing here is required wording. A team
+Use your own record types and keys; nothing here is required wording. A domain
 tracks search rankings for twelve keywords. Each weekly run already
 writes one record per keyword. To measure "keywords in the top 20":
 
@@ -113,4 +113,4 @@ writes one record per keyword. To measure "keywords in the top 20":
    "confounded_market"`, `metric_unit: "count"`.
 3. Snapshot it for the baseline.
 4. Attach `{"metricDeclarationId": "keywords_in_top_20", "targetValue": 6,
-   "direction": "up"}` to the team goal, then read the goal back.
+   "direction": "up"}` to the domain goal, then read the goal back.

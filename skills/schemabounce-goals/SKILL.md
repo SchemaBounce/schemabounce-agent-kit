@@ -1,6 +1,6 @@
 ---
 name: schemabounce-goals
-description: Use when you create, change, measure or report on a SchemaBounce goal, key result, outcome metric, North Star or org-chart domain goal, or when someone asks whether a number shows on a goal or team page. Covers how a goal is measured and how to read it back before saying it is done.
+description: Use when you create, change, measure or report on a SchemaBounce goal, key result, outcome metric, North Star or org-chart domain goal, or when someone asks whether a number shows on a goal or domain page. Covers how a goal is measured and how to read it back before saying it is done.
 compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that owns the goals. Reading needs view access. Declaring a metric, capturing a snapshot and creating or changing a goal are writes and need write access. Hosted Code Mode sessions have it read-only.
 metadata:
   kit: schemabounce-agent-kit
@@ -9,7 +9,7 @@ metadata:
 
 # SchemaBounce goals and outcome metrics
 
-SchemaBounce goals say what a workspace, a team or an agent is trying to
+SchemaBounce goals say what a workspace, a domain or an agent is trying to
 achieve, and prove progress with numbers the platform measures itself. The
 rulings behind this are decision records dec-059 and dec-042 in your
 workspace, if you can read them (see the `schemabounce-decisions` skill).
@@ -19,7 +19,7 @@ workspace, if you can read them (see the `schemabounce-decisions` skill).
 - **North Star**: the workspace's one standing goal with no parent. Every
   other goal sits under it.
 - **Goal**: level `workspace`, `domain` or `agent`. A **domain** is an
-  org-chart team of agents and people, so a domain goal is a team goal.
+  org-chart group of agents and people, shown on the Domains page.
   Horizon `deliverable` (it finishes) or `standing` (it never finishes and
   carries an on track or off track verdict).
 - **Key result**: a target on one declared outcome metric. It names the
@@ -58,7 +58,7 @@ workspace, if you can read them (see the `schemabounce-decisions` skill).
 
 - The **Goals** page shows each goal with its key results and progress, and
   lets a person declare a metric or link one.
-- A team's (domain's) page has a **Health** tab with the team's runs, tasks
+- A domain's page has a **Health** tab with the domain's runs, tasks
   and agents. Ask the person what they expect to see there before you
   promise it.
 
