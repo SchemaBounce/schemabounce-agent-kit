@@ -15,5 +15,5 @@ numbers the platform measures itself.
 - Read the goal back after a change and report what the read shows. The
   server computes progress; never compute your own.
 
-Full procedure: `skills/schemabounce-goals/SKILL.md` from
+Full procedure: `skills/schemabounce/references/goals.md` (the `schemabounce` skill) from
 https://github.com/SchemaBounce/schemabounce-agent-kit.

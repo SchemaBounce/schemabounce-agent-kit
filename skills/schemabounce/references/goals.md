@@ -1,18 +1,9 @@
----
-name: schemabounce-goals
-description: Use when you create, change, measure or report on a SchemaBounce goal, key result, outcome metric, North Star or org-chart domain goal, or when someone asks whether a number shows on a goal or domain page. Covers how a goal is measured and how to read it back before saying it is done.
-compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that owns the goals. Reading needs view access. Declaring a metric, capturing a snapshot and creating or changing a goal are writes and need write access. Hosted Code Mode sessions have it read-only.
-metadata:
-  kit: schemabounce-agent-kit
-  version: 0.4.2
----
-
 # SchemaBounce goals and outcome metrics
 
 SchemaBounce goals say what a workspace, a domain or an agent is trying to
 achieve, and prove progress with numbers the platform measures itself. The
 rulings behind this are decision records dec-059 and dec-042 in your
-workspace, if you can read them (see the `schemabounce-decisions` skill).
+workspace, if you can read them (see [references/decisions.md](references/decisions.md)).
 
 ## The pieces
 
@@ -40,7 +31,7 @@ workspace, if you can read them (see the `schemabounce-decisions` skill).
 3. **Measure what is already recorded.** Declare the metric over records
    that are written anyway, capture a first snapshot as the baseline, then
    attach it as a key result. The call sequence and a worked example are in
-   [references/measuring-a-goal.md](references/measuring-a-goal.md).
+   [references/goals-measuring.md](references/goals-measuring.md).
 4. **Read back before you report.** After you attach a key result, read the
    goal again and report what the read shows: the key result, its metric and
    the progress the server resolved. A key result reads `unresolved` until
@@ -67,3 +58,21 @@ workspace, if you can read them (see the `schemabounce-decisions` skill).
 Your SchemaBounce MCP access is read-only. You can read goals and metrics but
 not declare, snapshot or change one. Put the metric and key result you would
 add in your final message, marked as a proposal, so the person can do it.
+
+## Inside a SchemaBounce agent
+
+The same rules apply with the agent's own tools:
+
+| Step | Tool |
+|---|---|
+| List goals | `adl_list_goals` |
+| One goal with its parents and children | `adl_get_goal_context` |
+| Metrics already declared | `adl_list_outcome_metrics` |
+| Declare a metric | `adl_declare_outcome_metric` |
+| Capture its value (the first one is the baseline) | `adl_snapshot_outcome_metric` |
+| Create a goal | `adl_create_goal` |
+| Set key results (the list replaces the current one) | `adl_set_goal_key_results` |
+
+You can change only a goal you own, steward or created; otherwise ask a
+person to link the metric on the goal's page. Report the progress the result
+returns, never your own.

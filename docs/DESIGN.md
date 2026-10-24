@@ -148,7 +148,7 @@ for progressive disclosure. Read actions are marked read-only.
 plugin.json                       portable Codex manifest; no Claude hook import
 mcp.json                          portable hosted MCP connection with OAuth
 .agents/plugins/marketplace.json  local Codex development marketplace
-skills/schemabounce-decisions/    when and how to use decisions (Agent Skills format)
+skills/schemabounce/              the one SchemaBounce skill (Agent Skills format): index + references/ per area, decisions and goals included
 hooks/hooks.json                  phase 2: path-scoped context before edits
 agents/                           phase 3: decision steward subagent
 AGENTS.md                         the same rules for Codex and other agents

@@ -1,9 +1,9 @@
 {
   "name": "schemabounce",
   "displayName": "SchemaBounce agent kit",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "license": "Apache-2.0",
-  "description": "Just-in-time SchemaBounce decision records for coding agents: find the rulings that govern a change, cite them, and propose new ones without ratifying.",
+  "description": "The SchemaBounce skill for agents: the whole platform as one skill loaded just in time, with decision records cited from the files you change.",
   "author": {
     "name": "SchemaBounce",
     "email": "support@schemabounce.com",
@@ -13,9 +13,9 @@
   "repository": "https://github.com/SchemaBounce/schemabounce-agent-kit",
   "keywords": [
     "schemabounce",
+    "agents",
     "decisions",
-    "governance",
-    "context",
+    "goals",
     "mcp"
   ]
 }

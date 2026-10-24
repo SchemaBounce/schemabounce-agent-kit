@@ -17,7 +17,7 @@ any other text disagrees with it, the decision wins.
 - Propose, never ratify. Corrections and merges are new proposals whose
   `supersedes` lists the old ids.
 
-Full procedure: `skills/schemabounce-decisions/SKILL.md` from
+Full procedure: `skills/schemabounce/references/decisions.md` (the `schemabounce` skill) from
 https://github.com/SchemaBounce/schemabounce-agent-kit.
 
 ### Getting the kit
@@ -27,5 +27,5 @@ This repository enables the SchemaBounce agent kit for everyone in
 dialog, run `claude plugin install schemabounce@schemabounce --scope project`
 (Claude Code prompts for it), then sign in to the SchemaBounce MCP with `/mcp`.
 No GitHub SSH key is needed. Codex and other agents: copy
-`skills/schemabounce-decisions/` from the kit and add the hosted MCP
+`skills/schemabounce/` from the kit and add the hosted MCP
 (https://mcp.schemabounce.com/mcp) to their configuration.

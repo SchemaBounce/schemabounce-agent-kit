@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "schemabounce",
-  "version": "0.4.3",
-  "description": "Find and apply SchemaBounce decisions and measure goals through the hosted MCP.",
+  "version": "0.5.0",
+  "description": "One SchemaBounce skill covering the whole platform, plus decisions and goals through the hosted MCP.",
   "author": {
     "name": "SchemaBounce",
     "email": "support@schemabounce.com",
@@ -11,7 +11,13 @@
   "homepage": "https://github.com/SchemaBounce/schemabounce-agent-kit",
   "repository": "https://github.com/SchemaBounce/schemabounce-agent-kit",
   "license": "Apache-2.0",
-  "keywords": ["schemabounce", "decisions", "goals", "mcp"],
+  "keywords": [
+    "schemabounce",
+    "agents",
+    "decisions",
+    "goals",
+    "mcp"
+  ],
   "extensions": {
     "com.openai": {
       "hooks": [],
@@ -20,7 +26,10 @@
         "shortDescription": "Decision and goal workflows for coding agents",
         "developerName": "SchemaBounce",
         "category": "Productivity",
-        "capabilities": ["Read", "Write"],
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
         "websiteURL": "https://schemabounce.com",
         "privacyPolicyURL": "https://schemabounce.com/privacy"
       }
