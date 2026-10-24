@@ -55,11 +55,14 @@ Key-value entries in namespaces, persistent across runs.
 
 Namespaces:
 
-- Your own namespaces are private to you.
-- `shared:` is readable by every agent in the workspace. Read before you
-  write so you do not overwrite another agent's entry.
-- `domain:` is shared inside a domain.
-- `northstar:` is workspace configuration and read-only for agents.
+- A namespace with no prefix is yours alone: the platform files it under
+  your agent automatically.
+- `shared:<name>` is readable by every agent in the workspace. Read before
+  you write so you do not overwrite another agent's entry.
+- `domain:<domain>:<name>` is shared inside that domain, with agents that
+  belong to it or hold a grant to it.
+- `northstar:<name>` is workspace configuration: every agent reads it, only
+  people and the platform write it.
 
 The agent that first wrote an entry owns it. An entry another agent sealed or
 marked sensitive is hidden from you; results say how many were hidden. Never

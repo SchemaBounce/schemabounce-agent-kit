@@ -10,10 +10,10 @@ fails with the reason.
 
 - **Interactive clients**: add the server and sign in with OAuth (in Claude
   Code, `/mcp`). The SchemaBounce agent kit plugin adds the server for you.
-- **Scripts and CI**: a workspace service account (Settings, find it with the
-  console lookup) issues a client id and secret; exchange them at
-  `POST /api/v1/oauth/token` for a bearer token. Service accounts are the only
-  programmatic credential.
+- **Scripts and CI**: a workspace service account issues a client id and
+  secret; exchange them at `POST /api/v1/oauth/token` for a bearer token.
+  Create one in the console (find the page with the console lookup) or with
+  `sb_credential` `create_sa`.
 - **Personal agent tokens**: read-only by default and never beyond the
   person's own access (`sb_integrations` `personal_token_create`). The secret
   is shown once.

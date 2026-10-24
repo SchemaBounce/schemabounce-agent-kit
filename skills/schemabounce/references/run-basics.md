@@ -39,14 +39,22 @@ you were granted it: call it rather than checking a status page first.
 
 ## Limits per run
 
+The platform refuses a call past these:
+
 | Limit | Value |
 |---|---|
-| Messages sent | 5, and at most 1 alert per recipient (no repeat alert within 24h) |
 | Agents started (`adl_run_agent`, `adl_run_agents`, `adl_delegate_task`, `adl_propose_agent`) | 3 in total |
 | Outbound HTTP calls (`adl_proxy_call`) | 10 |
 | Files written or rendered | 20 |
 | Public share links | 10 |
 | Waits you hold at once | 20 |
+| Records in one `adl_bulk_upsert` | 100 |
+| One message body | 10,000 characters |
+
+Keep to these by habit; nothing refuses them, but people and other agents
+stop reading an agent that ignores them: at most 5 messages a run, at most
+1 alert per recipient a run, and no repeat of the same alert within 24
+hours.
 
 ## Large values
 
