@@ -214,6 +214,17 @@ Public overview: <https://schemabounce.com/linear-app>.
 
 ## Releases
 
+Releases run through the **Release** GitHub Actions workflow
+(`.github/workflows/release.yml`), dispatched by a person from `main` after
+merging `development`, with the version as input. It validates the skill with
+the official Agent Skills validator (`skills-ref`, hash-pinned) and
+`scripts/check_release.py`, tags `schemabounce--v<version>`, publishes the
+GitHub release with the archives below, re-pins the Claude and Codex
+marketplaces in [SchemaBounce/claude-plugins](https://github.com/SchemaBounce/claude-plugins)
+(through a GitHub App that can write only that repository; without it the
+summary says to re-pin by hand), and prints the hosted Code Mode pin for the
+argocd commit a person pushes.
+
 A release is a version bump in `.claude-plugin/plugin.json` and the
 marketplace entry, an immutable tag `schemabounce--v<version>`, and a GitHub
 release with two `git archive` assets of this folder under one top-level
