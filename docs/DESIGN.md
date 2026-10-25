@@ -145,7 +145,10 @@ for progressive disclosure. Read actions are marked read-only.
 .claude-plugin/plugin.json        plugin manifest (name: schemabounce)
 .claude-plugin/marketplace.json   this repo is its own marketplace
 .mcp.json                         the hosted SchemaBounce MCP (OAuth login per person)
-skills/schemabounce-decisions/    when and how to use decisions (Agent Skills format)
+plugin.json                       portable Codex manifest; no Claude hook import
+mcp.json                          portable hosted MCP connection with OAuth
+.agents/plugins/marketplace.json  local Codex development marketplace
+skills/schemabounce/              the one SchemaBounce skill (Agent Skills format): index + references/ per area, decisions and goals included
 hooks/hooks.json                  phase 2: path-scoped context before edits
 agents/                           phase 3: decision steward subagent
 AGENTS.md                         the same rules for Codex and other agents
@@ -231,7 +234,8 @@ is open (see "Open checks").
 |---|---|---|
 | Local Claude Code | Each repo checks in `.claude/settings.json` with the SchemaBounce marketplace (`SchemaBounce/claude-plugins`, name `schemabounce`) and `schemabounce@schemabounce` enabled; the marketplace entry pins a release tag of this repo. This repo's own marketplace entry is the development channel. Anthropic's directory lists the same release for everyone else | Hooks before edits; the skill at task start |
 | Hosted Code Mode | The platform fetches this plugin at a pinned digest and loads it into every session as a platform plugin (Agent SDK `plugins: [{type: "local"}]`), outside the repository | Core-api adds the repo digest to the session's start context; hooks before edits; read-only `sb_decision` |
-| Codex and other agents | `AGENTS.md` and the Agent Skills files, generated into each repo from this kit; MCP configured in their own config | The skill; `context` called explicitly |
+| Local Codex | Install the portable kit from the pinned SchemaBounce Codex marketplace; optionally render `AGENTS.md` from this kit into a repo | The skill calls `context` explicitly; Claude's edit hook is disabled |
+| Other agents | `AGENTS.md` and the Agent Skills files, generated into each repo from this kit; MCP configured in their own config | The skill; `context` called explicitly |
 | SchemaBounce agents | Native decision tools in the runtime; the decision rule deployed as a workspace rule | Same `context` call |
 
 Loading the kit into every hosted session without a per-person approval

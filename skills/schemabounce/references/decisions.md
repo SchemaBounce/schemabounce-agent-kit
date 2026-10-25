@@ -1,12 +1,3 @@
----
-name: schemabounce-decisions
-description: Use when a task touches architecture, pricing, security, licensing, infrastructure, product behaviour or agent and code-session rules in a SchemaBounce workspace, or when someone mentions, cites, asks the status of, or wants to propose a decision (dec-NNN). Finds the accepted decisions that apply, ignores superseded ones, cites their ids, and proposes new decisions without ever ratifying them.
-compatibility: Needs the hosted SchemaBounce MCP (https://mcp.schemabounce.com/mcp) signed in to the workspace that holds the decisions. Hosted Code Mode sessions have it read-only.
-metadata:
-  kit: schemabounce-agent-kit
-  version: 0.4.1
----
-
 # SchemaBounce decisions
 
 SchemaBounce records its rulings as **decision records** (`dec-NNN`) in the
@@ -36,7 +27,7 @@ the bug.
    before you state its status or ask anyone to ratify it.
 6. **Propose, never ratify.** Record a proposal only when the person you work
    for asks or agrees, with the `sb_decision` propose action, which assigns the
-   id (see [references/proposing.md](references/proposing.md)). Only a person
+   id (see [references/decisions-proposing.md](references/decisions-proposing.md)). Only a person
    with ratification authority accepts or rejects one. Never write `accepted`,
    `rejected` or `superseded` yourself; the server refuses it anyway.
 7. **Accepted decisions never change.** A correction is a new proposal whose
@@ -47,7 +38,7 @@ the bug.
 
 ## The edit hook, and when to call `context` yourself
 
-In Claude Code and Cowork this plugin ships a `PreToolUse` hook on `Edit`,
+In Claude Code and Cowork the SchemaBounce agent kit plugin ships a `PreToolUse` hook on `Edit`,
 `Write` and `MultiEdit`. Before each edit it asks the SchemaBounce MCP which
 accepted decisions govern the file and adds them to your context, with their
 ids. When you see them, follow and cite them. When nothing appears, the file
@@ -81,8 +72,8 @@ lookups and keep results small:
    decision for <your query>", never "no decision governs this".
 
 What a record holds, and how to write a proposal: see
-[references/record-fields.md](references/record-fields.md) and
-[references/proposing.md](references/proposing.md).
+[references/decisions-record-fields.md](references/decisions-record-fields.md) and
+[references/decisions-proposing.md](references/decisions-proposing.md).
 
 ## In a hosted Code Mode session
 
@@ -90,3 +81,17 @@ Your SchemaBounce MCP access is read-only. You can read and cite decisions but
 not record one. If your work needs a new decision, write the proposed
 statement in your final message, marked as a proposal, so the person can
 record it.
+
+## Inside a SchemaBounce agent
+
+The same rules apply with the agent's own tools:
+
+- `adl_decision_context`: the decisions that govern the topics or files you
+  are about to touch, as compact cards. Call it before you act in a governed
+  area.
+- `adl_decision_search`: find decisions by words. Accepted only by default;
+  pass `status` to see proposals and history. When its `strategy` says
+  `ilike`, an empty answer only means no text matched.
+- `adl_decision_propose`: record a proposal (Starter plan and higher). It is
+  always created `proposed`; only a person ratifies it in the Inbox.
+- A status changes without notice. Search again right before you state one.
