@@ -34,7 +34,7 @@ have returned.
 |---|---|
 | `sb_workspace` | attention, typed faults (`events`), workspace settings, notifications, egress policy, config export, members and roles |
 | `sb_agent` | agents, chat, runs and failures (`runs_get`, `runs_evidence`, `runs_scorecard`), setup status, overlays, domains, A2A, improvement proposals |
-| `sb_adl` | records, memory, knowledge graph, semantic search, DuckDB, workspace rules, embeddings |
+| `sb_adl` | records, memory, knowledge graph, semantic search, warehouse SQL (`duckdb_query`), workspace rules, embeddings |
 | `sb_inbox` | approvals, decision ratification (people only), pipeline proposals, file grants, escalations |
 | `sb_decision` | decision context, search, lineage, propose (see [references/decisions.md](references/decisions.md)) |
 | `sb_metrics` | goals, North Star, outcome metrics, overview, activity, domain health (see [references/goals.md](references/goals.md)) |

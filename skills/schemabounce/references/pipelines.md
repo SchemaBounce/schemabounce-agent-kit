@@ -4,8 +4,9 @@ A pipeline **route** moves data from a **source** to one or more **sinks**
 inside an **environment**. Sources include database change data capture
 (CDC), outbox tables, webhooks, SaaS connectors and scheduled direct pulls.
 Sinks include warehouses, streams, object storage, webhooks, databases and
-the workspace's own records (`agent_datastore`). Change events also land in
-the workspace's DuckDB `cdc_events` table for analysis (see
+the workspace's own records (`agent_datastore`). On a paid plan,
+pipeline data also lands as typed tables in the workspace warehouse's
+`sb_pipelines` schema, where SQL can read it (see
 [references/data-layer.md](references/data-layer.md)).
 
 ## Inside an agent: look, then propose
