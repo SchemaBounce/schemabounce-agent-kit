@@ -66,7 +66,7 @@ are not allowed to make fails with the reason.
 |---|---|
 | How a run works: messages, pending tasks, deferred tools, limits | [references/run-basics.md](references/run-basics.md) |
 | Other agents: roster, messages, delegation, tasks, escalation, waits, remote agents | [references/agents-and-tasks.md](references/agents-and-tasks.md) |
-| Records, semantic search, memory, knowledge graph, CDC analytics, large payloads, cleanup | [references/data-layer.md](references/data-layer.md) |
+| Records, semantic search, memory, knowledge graph, warehouse SQL, large payloads, cleanup | [references/data-layer.md](references/data-layer.md) |
 | Files: read, write, render to PDF or Word, export, import, share | [references/files.md](references/files.md) |
 | Workflows, triggers and schedules: the graph contract, node types, failures | [references/workflows.md](references/workflows.md) |
 | Data pipelines: sources, connectors, sinks, routes, proposals, health | [references/pipelines.md](references/pipelines.md) |
