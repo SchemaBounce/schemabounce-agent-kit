@@ -213,7 +213,9 @@ jobs:
             --arg release "${RESULT_RELEASE}" \
             --arg marketplaces "${RESULT_MARKETPLACES}" \
             --arg code_mode_pin "${RESULT_CODE_MODE_PIN}" \
-            '{repo: $repo, tag: $tag, version: $version, run_url: $run_url, timestamp: $timestamp,
+            '{text: ("Agent kit release " + $tag + ": validate " + $validate + ", release " + $release
+                + ", marketplaces " + $marketplaces + ", code-mode-pin " + $code_mode_pin + ". " + $run_url),
+              repo: $repo, tag: $tag, version: $version, run_url: $run_url, timestamp: $timestamp,
               jobs: {validate: $validate, release: $release, marketplaces: $marketplaces, "code-mode-pin": $code_mode_pin}}')"
           curl --silent --show-error --fail-with-body \
             --connect-timeout 10 --max-time 30 \
