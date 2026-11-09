@@ -18,15 +18,25 @@ session slot.
 1. `adl_start_code_session` with a clear `prompt` (what to change, how to
    check it, what done means). The repository comes from `repo`, else the
    linked task, else the last repository this agent coded in. Every start
-   waits for a person's approval in the Inbox.
+   waits for a person's approval in the Inbox. Pick `session_type`:
+   `read_only` for verification, review or investigation that changes no
+   file (a small sandbox, no setup or checks, no push; it completes after one
+   turn and its answer is the final message), `content` for docs and posts
+   (checks that only cover code are skipped), else `code` (the default).
+   `read_only` and `content` run on a Sonnet model unless you name one.
 2. Do not set a wait for your own session: you are woken when it finishes,
-   fails or needs a person.
+   fails or needs a person. A start can come back `queued` (every slot the
+   plan allows is busy, or no sandbox is free): it starts on its own in
+   order, so never start another for the same work.
 3. `adl_code_session_status`: state, branch, pull request, failure reason,
    spend against budget, and `lastTurn` (tests run, commits, files changed).
    Read `lastTurn` first. `adl_code_session_events` gives the play-by-play.
 4. When it waits on a decision (a tool approval, a question, a plan, a push),
    only a person can make it, in the Inbox. Tell them; never approve it
-   yourself.
+   yourself. A session that waits more than 10 minutes, or sits idle while
+   others are queued, is parked (`awaiting_resume`): its work is saved and
+   its sandbox freed. It resumes on its own when the decision lands or a
+   sandbox frees, so do not continue it by hand.
 5. `adl_push_code_session` commits and pushes while the session is still
    open, and opens a pull request with `open_pr`. Unless the workspace
    turned push approval off, it waits for a person. The pull request targets
@@ -47,9 +57,16 @@ API key or credits, and that start is held for a person who sees the model,
 its rate, the budget cap and a typical cost before approving. Billing mode
 and license kind are shown on the session.
 
+A session that finished with its work saved but its pull request never
+opened (`publishOutcome` `unpublished` or `pr_failed`) raises an Inbox
+notice. Outside an agent, `sb_code_session` `publish` opens the pull request
+from the branch it already pushed, with no model turn and no cost; work that
+exists only in the checkpoint needs `continue` instead.
+
 ## Report honestly
 
-- A session that never reached a push has no branch or pull request.
+- A session that never reached a push has no branch or pull request. A
+  `read_only` session never has one: report its final message.
 - `review.unavailable` means the platform reviewer did not run, not that a
   person reviewed it.
 - Never say a person decided something unless a field says so.
@@ -58,6 +75,9 @@ and license kind are shown on the session.
 
 `sb_code_session`: `create`, `status`, `context`, `events`, `diff`,
 `result`, `push` and `cancel` (each asks for a typed confirmation phrase),
-`interrupt` (stop the current turn, keep the session), `continue`, `rerun`,
+`interrupt` (stop the current turn, keep the session), `pause`, `resume`,
+`continue`, `rerun` (a second rerun while one is open returns that one),
+`publish` (open the pull request from the pushed branch, no model cost),
 `approvals_respond` (decide a held tool call as the signed-in person),
-`compute_budget`.
+`compute_budget`. `create` takes `session_type` (`code`, `read_only`,
+`content`).

@@ -1,4 +1,4 @@
-# The Agent Data Layer: records, memory, graph, analytics
+# The Agent Data Layer: records, memory, graph, warehouse
 
 Paths in this file are relative to the skill root.
 
@@ -9,7 +9,7 @@ Four stores, each with its own tools. Pick by what you are holding:
 | Structured business data other agents and people read (contacts, findings, tasks) | Records |
 | Your own notes, state between runs, learned preferences | Memory |
 | How records relate (works at, belongs to, owns) | Knowledge graph |
-| Raw change events streamed from pipelines | CDC analytics (DuckDB) |
+| Pipeline data, tables you build, analytics over runs and usage | Warehouse (SQL) |
 
 ## Records
 
@@ -87,20 +87,60 @@ real purge waits for a person in the Inbox).
   point at deleted records (dry run first; the real delete waits for a
   person).
 
-## CDC analytics (DuckDB)
+## Warehouse (SQL)
 
-`adl_query_duckdb` runs read-only SQL over change events streamed from the
-workspace's pipelines. Events land in one table, `cdc_events` (route,
-source, schema and table name, operation, a JSON `payload`, timestamps).
+`adl_query_duckdb` runs full SQL in the workspace's own warehouse, a DuckDB
+database. Parameters: `sql` (required), `params` (positional values) and
+`limit`. Outside an agent the same thing is `sb_adl` `duckdb_query` with `sql`
+and `max_rows`. The warehouse is not the record store: records, memory and
+graph edges are not in it, so use the tools above and `adl_get_data_stats`.
 
-- Start with `SHOW TABLES` and `DESCRIBE cdc_events`.
+**Three schemas.**
+- `sb_pipelines`: typed tables your pipelines land, named after their source
+  tables. Read-only to your SQL; `COPY ... FROM` it is allowed. An older
+  `cdc_events` change log can still sit there while a pipeline moves over.
+- Your own tables: create and change them freely.
+- `sb_platform`: SchemaBounce's run, usage and billing metadata
+  (`agent_runs`, `tool_calls`, `credits_ledger`, `metered_usage`,
+  `lake_queries`). Read-only, metadata only.
+
+**What runs.** `SELECT`, `SHOW`, `DESCRIBE`, `CREATE TABLE` or `VIEW`,
+`CREATE TABLE AS`, `INSERT`, `UPDATE` or `DELETE` with a `WHERE`, `MERGE` and
+`ALTER`. Send one statement per call when it changes data. `ATTACH`,
+`INSTALL`, `LOAD`, `SET`, `COPY` and file or URL reads are refused.
+
+**Destructive statements need a person.** `DROP`, `TRUNCATE`, a `DELETE` or
+`UPDATE` with no `WHERE` (or an always-true one), `ALTER ... DROP COLUMN` and
+`CREATE OR REPLACE` wait in the Inbox for a person's approval, then run once
+(dec-224, dec-045). You cannot approve your own. Time travel is the undo:
+it restores what a statement removed, inside the plan's window.
+
+**Working habits.**
+- Start with `SHOW TABLES`, `DESCRIBE <table>` or `information_schema.columns`.
 - Aggregate (`count`, `sum`, `GROUP BY`) rather than pulling rows: replies
-  over 8 MiB are refused.
+  over 8 MiB are refused, and rows past `limit` are dropped with
+  `truncated: true`.
 - Pass user-supplied values through `params`.
-- It holds pipeline events only. Records, memory and graph edges are not in
-  it: use the tools above for those, and `adl_get_data_stats` for counts.
+- There are no cross-workspace queries.
 
-Outside: `sb_adl` `duckdb_query`.
+**Paid plans only (dec-225).** The warehouse comes with every paid plan
+(Personal and up). Free has none. A refused call carries a code:
+
+| Code | HTTP | Meaning |
+|---|---|---|
+| `PLAN_FEATURE_REQUIRED` | 402 | The plan has no warehouse. A person upgrades. |
+| `WAREHOUSE_FROZEN` | 402 | The plan lapsed. Queries and writes stop; data is kept 30 days, then deleted. Upgrading restores it as it was. |
+| `DUCKDB_PROVISIONING` | 409 | The warehouse is starting. Wait for `Retry-After` (10 seconds) and retry. |
+
+**Billing.** A query bills its execution time, rounded up to a whole second,
+after the plan's included analytics hours; storage past the plan's allowance
+bills per GB-month, both in credits (dec-223, dec-225). Do not loop on a
+query to "check again": each run is metered.
+
+People reach the same warehouse in the console and over the REST routes
+`.../agent-data-layer/duckdb/query` (read), `/execute` (change) and
+`/classify`. A Postgres-protocol endpoint for BI tools is built but not open
+yet.
 
 ## Crystallized skills (pre-computed queries)
 
