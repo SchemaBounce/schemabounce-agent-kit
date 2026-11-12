@@ -1,7 +1,7 @@
 {
   "name": "schemabounce",
   "displayName": "SchemaBounce agent kit",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "Apache-2.0",
   "description": "The SchemaBounce skill for agents: the whole platform as one skill loaded just in time, with decision records cited from the files you change.",
   "author": {
