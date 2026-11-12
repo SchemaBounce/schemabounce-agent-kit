@@ -144,7 +144,8 @@ for progressive disclosure. Read actions are marked read-only.
 ```
 .claude-plugin/plugin.json        plugin manifest (name: schemabounce)
 .claude-plugin/marketplace.json   this repo is its own marketplace
-.mcp.json                         the hosted SchemaBounce MCP (OAuth login per person)
+.mcp.json                         the hosted SchemaBounce MCP (OAuth login per person, or a credentials file via headersHelper)
+scripts/mcp-headers.sh            headersHelper: {} with no credentials file, else a bearer from it (mcp_headers.py)
 plugin.json                       portable Codex manifest; no Claude hook import
 mcp.json                          portable hosted MCP connection with OAuth
 .agents/plugins/marketplace.json  local Codex development marketplace
