@@ -258,6 +258,33 @@ marketplaces in [SchemaBounce/claude-plugins](https://github.com/SchemaBounce/cl
 summary says to re-pin by hand), and prints the hosted Code Mode pin for the
 argocd commit a person pushes.
 
+Failure alert. The last job of the workflow, `notify`, runs after every other
+job whatever their outcome. It posts one JSON body to the URL in the
+repository secret `MARKETPLACE_ALERT_WEBHOOK_URL`. If the secret is empty, the
+job prints one line saying alerts are not configured and exits 0, so it never
+fails a release. The secret is passed through the environment and is never
+printed. The body holds the repository, the tag, the version, the run URL, a
+UTC timestamp, and the result of each job, which is one of `success`,
+`failure`, `cancelled`, or `skipped`. It also carries a one-line `text`
+summary, so a Slack incoming webhook URL works as the secret as it is:
+
+```json
+{
+  "text": "Agent kit release schemabounce--v0.5.0: validate success, release success, marketplaces failure, code-mode-pin success. https://github.com/SchemaBounce/schemabounce-agent-kit/actions/runs/123456789",
+  "repo": "SchemaBounce/schemabounce-agent-kit",
+  "tag": "schemabounce--v0.5.0",
+  "version": "0.5.0",
+  "run_url": "https://github.com/SchemaBounce/schemabounce-agent-kit/actions/runs/123456789",
+  "timestamp": "2026-11-05T12:00:00Z",
+  "jobs": {
+    "validate": "success",
+    "release": "success",
+    "marketplaces": "failure",
+    "code-mode-pin": "success"
+  }
+}
+```
+
 A release is a version bump in `.claude-plugin/plugin.json` and the
 marketplace entry, an immutable tag `schemabounce--v<version>`, and a GitHub
 release with two `git archive` assets of this folder under one top-level
