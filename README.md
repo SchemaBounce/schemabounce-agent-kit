@@ -48,6 +48,34 @@ Add the SchemaBounce marketplace once, then install the plugin:
 
 Then sign in to the SchemaBounce MCP with `/mcp`.
 
+### Over SSH or on a headless machine
+
+Browser sign-in sends the browser back to `localhost` on the machine running
+Claude Code, so it cannot finish when that machine is remote. Two ways round it:
+
+- **Sign in once by pasting:** `claude mcp login plugin:schemabounce:schemabounce --no-browser`
+  in an SSH terminal (`ssh -t`). Open the link it prints on your own machine,
+  approve, then paste the address the browser fails to load back at the
+  prompt.
+- **Use a credentials file:** create a personal agent token in the console,
+  then save it, mode 0600, as `~/.config/schemabounce/credentials.json`:
+
+  ```json
+  {
+    "SCHEMABOUNCE_CLIENT_ID": "pat_...",
+    "SCHEMABOUNCE_CLIENT_SECRET": "..."
+  }
+  ```
+
+  The plugin's `headersHelper` (`scripts/mcp-headers.sh`) exchanges it for a
+  short-lived token at every connection, so no browser sign-in is needed. With
+  no file it prints nothing and browser sign-in works as before. It needs
+  `sh` and Python 3, and it only talks to `https://api.schemabounce.com`. A
+  file whose `SCHEMABOUNCE_API_URL` names any other address is refused, so a
+  local test credential is never sent to production. A file that fails (wrong
+  secret, revoked token) leaves the server at "Needs authentication", the same
+  as with no file.
+
 No GitHub SSH key is needed: the marketplace entry points at this repository
 by HTTPS URL. On a machine without an SSH key, add the marketplace by URL too:
 `claude plugin marketplace add https://github.com/SchemaBounce/claude-plugins.git`.
@@ -191,10 +219,15 @@ Public overview: <https://schemabounce.com/linear-app>.
 - **Fetches:** nothing. No downloads, no package installs.
 - **Signed out or unreachable:** the edit goes ahead with no decision
   context. The hook never blocks an edit.
-- **Access:** the MCP server needs each person's own SchemaBounce sign-in and
-  returns only what that person may read.
+- **Access:** the MCP server needs each person's own SchemaBounce sign-in, or
+  their credentials file, and returns only what that person may read.
+- **Credentials file:** read only when `~/.config/schemabounce/credentials.json`
+  exists. Its secret goes only to `https://api.schemabounce.com`, in the token
+  exchange, and is never printed or logged.
 - **Platforms:** any system Claude Code runs on. `scripts/agents_md.py` is
-  optional and needs Python 3, nothing else.
+  optional and needs Python 3, nothing else. The credentials-file path needs
+  `sh` and Python 3; browser sign-in needs only `sh`, to run the helper that
+  prints nothing.
 
 ## What is inside
 
