@@ -161,8 +161,8 @@ Patterns used, verified against the Claude Code documentation on 2026-10-14:
   frontmatter, body loaded on use, references loaded on demand), so the same
   files serve Claude Code and other agents.
 - **Hooks** (phase 2, version 0.2.0) call the MCP directly with
-  `type: "mcp_tool"` on `PreToolUse` for `Edit|Write|MultiEdit`. See "The edit
-  hook" below. `mcp_tool` hooks are skipped at session start, so
+  `type: "mcp_tool"` on `PreToolUse` for `Edit|Write|MultiEdit` and on
+  `PostToolUse` for `Bash`. See "The edit hook" below. `mcp_tool` hooks are skipped at session start, so
   start-of-session context comes from the platform (Code Mode) or the skill
   (local).
 - **MCP tool search** keeps tool schemas deferred until used.
@@ -206,6 +206,39 @@ https://code.claude.com/docs/en/plugins-reference):
    interactive session.
 5. **Not at session start.** `SessionStart` and `Setup` `mcp_tool` hooks are
    skipped, so this hook only covers edits.
+
+### Files written through a shell (the Bash hook)
+
+An agent can write a file without `Edit` or `Write`: a heredoc, `tee`, `sed -i`,
+`mv`, a python or node one-liner. Prod session cs_bepp438j (core-api #1765,
+2026-11-19) wrote every file that way, so the hook above never fired and the
+session cited a decision only because a code comment it grepped named one.
+`hooks/hooks.json` therefore also runs an `mcp_tool` hook on `PostToolUse` for
+`Bash`, with `command: "${tool_input.command}"` in place of `file_path`. It runs
+after the command, so the files exist when it answers, and the
+`hookEventName` of its envelope is `PostToolUse`.
+
+The server, not the kit, works out which files the command wrote. A hook cannot
+diff `git status` and a `command` hook cannot call the MCP, so `sb_decision`
+reads the command text for the common writes (a `>` or `>>` redirect, `tee`,
+`sed -i`, `mv`, `cp`, `touch`, `git apply`, python `open(path, "w")` and
+`write_text`, node and Go write calls), keeps the repository-relative paths
+under the repository root, and asks `context` for those. A command that wrote
+no repository file answers empty text. It is a reader of shell text, not a
+shell: a write it does not recognise is not looked up, which is why the skill
+still tells the agent to call `context` itself before it writes through a
+shell. The server does not keep the command text, only the paths, and does not
+log either.
+
+The server does not know which decisions the session already saw, so a second
+command that writes the same file shows them again. The Bash answer uses a
+smaller card budget than a file edit for that reason.
+
+Both hooks send `session_id: "${session_id}"`, the engine session. When a hook
+is handed decisions the server writes one audit event, `decision.delivered`,
+with the decision ids, the repository, the tool (`Edit` or `Bash`) and that
+session id, never a path, a statement or a command. That is the per-session
+record of whether the decisions reached the agent.
 
 ### Why the server shapes the answer (a command hook cannot replace it)
 
