@@ -178,3 +178,46 @@ jobs:
             echo "  value: \"https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/schemabounce-${VERSION}.tar.gz\""
             echo '```'
           } >> "${GITHUB_STEP_SUMMARY}"
+
+  # Alert hook: one JSON post with every job result, so a failed release or
+  # re-pin is seen without opening the Actions tab. Uses no third-party
+  # action. An empty secret means alerts are off; it never fails the release.
+  notify:
+    name: Post the release result to the alert webhook
+    needs: [validate, release, marketplaces, code-mode-pin]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Post the alert
+        env:
+          WEBHOOK_URL: ${{ secrets.MARKETPLACE_ALERT_WEBHOOK_URL }}
+          RESULT_VALIDATE: ${{ needs.validate.result }}
+          RESULT_RELEASE: ${{ needs.release.result }}
+          RESULT_MARKETPLACES: ${{ needs.marketplaces.result }}
+          RESULT_CODE_MODE_PIN: ${{ needs.code-mode-pin.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "${WEBHOOK_URL}" ]; then
+            echo "MARKETPLACE_ALERT_WEBHOOK_URL is not set: release alerts are not configured."
+            exit 0
+          fi
+          body="$(jq -n \
+            --arg repo "${GITHUB_REPOSITORY}" \
+            --arg tag "${TAG}" \
+            --arg version "${VERSION}" \
+            --arg run_url "${RUN_URL}" \
+            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg validate "${RESULT_VALIDATE}" \
+            --arg release "${RESULT_RELEASE}" \
+            --arg marketplaces "${RESULT_MARKETPLACES}" \
+            --arg code_mode_pin "${RESULT_CODE_MODE_PIN}" \
+            '{text: ("Agent kit release " + $tag + ": validate " + $validate + ", release " + $release
+                + ", marketplaces " + $marketplaces + ", code-mode-pin " + $code_mode_pin + ". " + $run_url),
+              repo: $repo, tag: $tag, version: $version, run_url: $run_url, timestamp: $timestamp,
+              jobs: {validate: $validate, release: $release, marketplaces: $marketplaces, "code-mode-pin": $code_mode_pin}}')"
+          curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 --max-time 30 \
+            -X POST -H "Content-Type: application/json" \
+            --data "${body}" "${WEBHOOK_URL}"

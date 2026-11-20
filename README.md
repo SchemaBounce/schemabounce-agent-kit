@@ -32,7 +32,7 @@ the MCP, and to read the goal back before saying a number shows anywhere.
 Development status: **version 0.5.0**. The public catalog remains on 0.4.2
 until this version is released. Version 0.5.0 folds the separate decisions
 and goals skills into the one `schemabounce` skill. The decision guidance
-works with today's hosted SchemaBounce MCP tools. The pre-edit hook asks the MCP which decisions govern
+works with today's hosted SchemaBounce MCP tools. The pre-edit hook, and a hook after Bash commands, ask the MCP which decisions govern
 the file being changed; it returns decisions once SchemaBounce has classified
 them by repository path, and nothing before that. Code Mode loading is
 described in [docs/DESIGN.md](docs/DESIGN.md).
@@ -47,6 +47,34 @@ Add the SchemaBounce marketplace once, then install the plugin:
 ```
 
 Then sign in to the SchemaBounce MCP with `/mcp`.
+
+### Over SSH or on a headless machine
+
+Browser sign-in sends the browser back to `localhost` on the machine running
+Claude Code, so it cannot finish when that machine is remote. Two ways round it:
+
+- **Sign in once by pasting:** `claude mcp login plugin:schemabounce:schemabounce --no-browser`
+  in an SSH terminal (`ssh -t`). Open the link it prints on your own machine,
+  approve, then paste the address the browser fails to load back at the
+  prompt.
+- **Use a credentials file:** create a personal agent token in the console,
+  then save it, mode 0600, as `~/.config/schemabounce/credentials.json`:
+
+  ```json
+  {
+    "SCHEMABOUNCE_CLIENT_ID": "pat_...",
+    "SCHEMABOUNCE_CLIENT_SECRET": "..."
+  }
+  ```
+
+  The plugin's `headersHelper` (`scripts/mcp-headers.sh`) exchanges it for a
+  short-lived token at every connection, so no browser sign-in is needed. With
+  no file it prints nothing and browser sign-in works as before. It needs
+  `sh` and Python 3, and it only talks to `https://api.schemabounce.com`. A
+  file whose `SCHEMABOUNCE_API_URL` names any other address is refused, so a
+  local test credential is never sent to production. A file that fails (wrong
+  secret, revoked token) leaves the server at "Needs authentication", the same
+  as with no file.
 
 No GitHub SSH key is needed: the marketplace entry points at this repository
 by HTTPS URL. On a machine without an SSH key, add the marketplace by URL too:
@@ -174,27 +202,36 @@ Public overview: <https://schemabounce.com/linear-app>.
 | Part | Claude Code | Codex | Cowork | claude.ai chat |
 |---|---|---|---|---|
 | Skill `schemabounce` | Loads | Loads | Loads | Loads |
-| Pre-edit hook | Loads | Not loaded | Loads | Not loaded (chat has no hooks) |
+| Pre-edit and Bash hooks | Loads | Not loaded | Loads | Not loaded (chat has no hooks) |
 | Hosted SchemaBounce MCP | Loads | Connect with OAuth | Connect it from the plugin's Connectors tab | Connect it from the plugin's Connectors tab |
 
 ## What this plugin runs, sends and fetches
 
 - **Runs:** nothing on your machine by itself. The hook is an MCP tool call,
   not a command. `scripts/agents_md.py` runs only when you run it.
-- **Sends:** before each Edit, Write or MultiEdit in Claude Code or Cowork,
-  the hook calls `sb_decision` (action `context`) on
-  `https://mcp.schemabounce.com/mcp` with your session's working directory
-  and the absolute path of the file being edited. The server uses the
-  directory names to work out which repository you are in and which decisions
-  apply; it does not store or log the absolute path. The reply is text added
+- **Sends:** before each Edit, Write or MultiEdit, and after each Bash command,
+  in Claude Code or Cowork, the hook calls `sb_decision` (action `context`) on
+  `https://mcp.schemabounce.com/mcp` with your session's working directory,
+  the engine session id and either the absolute path of the file being edited
+  or the text of the shell command that ran. The server uses the directory
+  names to work out which repository you are in and which files the command
+  wrote, then which decisions apply. It does not store or log the absolute
+  path or the command text; when the hook is handed decisions it records their
+  ids, the repository and the session id in the workspace audit log. A shell
+  command can contain a secret: do not put one on a command line. The reply is text added
   to the model's context. Nothing else is sent, and there is no telemetry.
 - **Fetches:** nothing. No downloads, no package installs.
 - **Signed out or unreachable:** the edit goes ahead with no decision
   context. The hook never blocks an edit.
-- **Access:** the MCP server needs each person's own SchemaBounce sign-in and
-  returns only what that person may read.
+- **Access:** the MCP server needs each person's own SchemaBounce sign-in, or
+  their credentials file, and returns only what that person may read.
+- **Credentials file:** read only when `~/.config/schemabounce/credentials.json`
+  exists. Its secret goes only to `https://api.schemabounce.com`, in the token
+  exchange, and is never printed or logged.
 - **Platforms:** any system Claude Code runs on. `scripts/agents_md.py` is
-  optional and needs Python 3, nothing else.
+  optional and needs Python 3, nothing else. The credentials-file path needs
+  `sh` and Python 3; browser sign-in needs only `sh`, to run the helper that
+  prints nothing.
 
 ## What is inside
 
@@ -204,7 +241,7 @@ Public overview: <https://schemabounce.com/linear-app>.
 | `plugin.json` | Portable plugin manifest for Codex and other Agent Plugins hosts; explicitly disables Claude hook discovery in Codex |
 | `mcp.json` | Portable hosted MCP connection with OAuth client registration |
 | `.agents/plugins/marketplace.json` | Codex development marketplace for this checkout |
-| `hooks/hooks.json` | Before an edit, asks the MCP which decisions govern the file (see DESIGN.md, "The edit hook") |
+| `hooks/hooks.json` | Before an edit and after a Bash command, asks the MCP which decisions govern the file (see DESIGN.md, "The edit hook") |
 | `.mcp.json` | The hosted SchemaBounce MCP |
 | `skills/schemabounce/` | The one SchemaBounce skill (Agent Skills format): `SKILL.md` index plus `references/` per area, including decisions (`references/decisions*.md`) and goals (`references/goals*.md`) |
 | `templates/` | Text other agents' instruction files include. `AGENTS.goals.md` is the goals rules for agents that do not load skills; `scripts/agents_md.py` renders only the decisions text today |
@@ -224,6 +261,33 @@ marketplaces in [SchemaBounce/claude-plugins](https://github.com/SchemaBounce/cl
 (through a GitHub App that can write only that repository; without it the
 summary says to re-pin by hand), and prints the hosted Code Mode pin for the
 argocd commit a person pushes.
+
+Failure alert. The last job of the workflow, `notify`, runs after every other
+job whatever their outcome. It posts one JSON body to the URL in the
+repository secret `MARKETPLACE_ALERT_WEBHOOK_URL`. If the secret is empty, the
+job prints one line saying alerts are not configured and exits 0, so it never
+fails a release. The secret is passed through the environment and is never
+printed. The body holds the repository, the tag, the version, the run URL, a
+UTC timestamp, and the result of each job, which is one of `success`,
+`failure`, `cancelled`, or `skipped`. It also carries a one-line `text`
+summary, so a Slack incoming webhook URL works as the secret as it is:
+
+```json
+{
+  "text": "Agent kit release schemabounce--v0.5.0: validate success, release success, marketplaces failure, code-mode-pin success. https://github.com/SchemaBounce/schemabounce-agent-kit/actions/runs/123456789",
+  "repo": "SchemaBounce/schemabounce-agent-kit",
+  "tag": "schemabounce--v0.5.0",
+  "version": "0.5.0",
+  "run_url": "https://github.com/SchemaBounce/schemabounce-agent-kit/actions/runs/123456789",
+  "timestamp": "2026-11-05T12:00:00Z",
+  "jobs": {
+    "validate": "success",
+    "release": "success",
+    "marketplaces": "failure",
+    "code-mode-pin": "success"
+  }
+}
+```
 
 A release is a version bump in `.claude-plugin/plugin.json` and the
 marketplace entry, an immutable tag `schemabounce--v<version>`, and a GitHub

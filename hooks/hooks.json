@@ -12,7 +12,28 @@
               "action": "context",
               "format": "claude_code_hook",
               "cwd": "${cwd}",
-              "file_path": "${tool_input.file_path}"
+              "file_path": "${tool_input.file_path}",
+              "session_id": "${session_id}"
+            },
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "plugin:schemabounce:schemabounce",
+            "tool": "sb_decision",
+            "input": {
+              "action": "context",
+              "format": "claude_code_hook",
+              "cwd": "${cwd}",
+              "command": "${tool_input.command}",
+              "session_id": "${session_id}"
             },
             "timeout": 10
           }

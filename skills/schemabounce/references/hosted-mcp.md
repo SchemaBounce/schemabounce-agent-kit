@@ -10,6 +10,13 @@ fails with the reason.
 
 - **Interactive clients**: add the server and sign in with OAuth (in Claude
   Code, `/mcp`). The SchemaBounce agent kit plugin adds the server for you.
+- **Claude Code over SSH or headless**: browser OAuth returns to `localhost`
+  on the machine running Claude Code, so it fails there. Run
+  `claude mcp login plugin:schemabounce:schemabounce --no-browser` and paste
+  the redirect address back, or save a personal agent token as
+  `~/.config/schemabounce/credentials.json` (`SCHEMABOUNCE_CLIENT_ID`,
+  `SCHEMABOUNCE_CLIENT_SECRET`, mode 0600); the plugin then signs in with it
+  at every connection.
 - **Scripts and CI**: a workspace service account issues a client id and
   secret; exchange them at `POST /api/v1/oauth/token` for a bearer token.
   Create one in the console (find the page with the console lookup) or with

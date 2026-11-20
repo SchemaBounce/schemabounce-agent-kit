@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "schemabounce",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "One SchemaBounce skill covering the whole platform, plus decisions and goals through the hosted MCP.",
   "author": {
     "name": "SchemaBounce",

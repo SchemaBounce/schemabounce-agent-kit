@@ -11,7 +11,7 @@
       "name": "schemabounce",
       "source": "./",
       "description": "The SchemaBounce skill: the whole platform as one skill loaded just in time, and the decisions that govern the files you change.",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "category": "development",
       "tags": [
         "schemabounce",

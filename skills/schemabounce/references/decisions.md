@@ -39,9 +39,12 @@ the bug.
 ## The edit hook, and when to call `context` yourself
 
 In Claude Code and Cowork the SchemaBounce agent kit plugin ships a `PreToolUse` hook on `Edit`,
-`Write` and `MultiEdit`. Before each edit it asks the SchemaBounce MCP which
-accepted decisions govern the file and adds them to your context, with their
-ids. When you see them, follow and cite them. When nothing appears, the file
+`Write` and `MultiEdit`, and a `PostToolUse` hook on `Bash`. Before each edit,
+and after each shell command that wrote a repository file (a heredoc, `tee`,
+`sed -i`, `mv`, a script), it asks the SchemaBounce MCP which accepted decisions
+govern the file and adds them to your context, with their ids. The Bash hook
+reads the command text for common writes only, so a file written some other way
+is not looked up: call `context` yourself before you write through a shell. When you see them, follow and cite them. When nothing appears, the file
 has no classified decision, or the MCP is signed out or unreachable: the hook
 fails quietly, so silence is not proof that nothing applies. claude.ai chat
 loads no hooks: there, call `context` yourself.

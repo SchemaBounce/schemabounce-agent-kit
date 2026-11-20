@@ -2,7 +2,8 @@
   "mcpServers": {
     "schemabounce": {
       "type": "http",
-      "url": "https://mcp.schemabounce.com/mcp"
+      "url": "https://mcp.schemabounce.com/mcp",
+      "headersHelper": "sh \"${CLAUDE_PLUGIN_ROOT}/scripts/mcp-headers.sh\""
     }
   }
 }
