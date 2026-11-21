@@ -52,6 +52,7 @@ Minimum shape that runs:
   `event_type`), `webhook_trigger`, `pipeline_source` (only a person deploys a
   workflow that has one).
 - **Agent and model steps**: `agent_action`, `llm_prompt`, `code_job`.
+- **Tool call, no model**: `mcp_tool` (see below).
 - **Control flow**: `condition` (`expression`), `for_each`, `sub_workflow`,
   `merge`, `delay` (`delay_seconds`; it only waits time), `escalation` (the
   approval checkpoint: the run pauses until a person responds; `targetMode`
@@ -102,6 +103,35 @@ the steps before it:
   `{{field}}`, `{{trigger.field}}`; an unresolvable reference becomes empty).
 - Escalations created before this behaviour keep their raw context and show
   no review section.
+
+## Calling a tool with no model (`mcp_tool`)
+
+`mcp_tool` calls one tool on a connected MCP server with the arguments you
+write. No model runs and no tokens are spent. Use it for the publish or send
+step after an agent drafts and a person reviews, instead of an `agent_action`
+whose prompt only says to call a tool.
+
+Config: `agentId` (the agent whose grants and approval policy the call uses;
+the agent is not woken, and the run is unattended so a personal connection is
+never used), `server`, `tool` (without the `server__` prefix), and
+`arguments`. A string in `arguments` may use `{{node_id.field}}` (any earlier
+step), `{{_current.field}}` or `{{trigger.field}}`. A string that is only one
+reference keeps its JSON type; one that does not resolve fails the step. An
+agent step's reply is its `output` field, so `{{draft.output}}`.
+
+- A tool the agent's approval policy holds, and any publish-class tool, parks
+  in Inbox > Actions with the exact arguments and the run waits. Approving
+  sends that one call once; the step's result is the tool's own result.
+  **Rejecting it fails the run**, so put an `escalation` before the call when a
+  person should choose whether to publish.
+- A tool error, a missing grant or an unreachable server fails the step.
+- A dry run resolves the agent and arguments and sends nothing.
+- Deploy blocks on an unknown `agentId` and warns on a server the agent has no
+  grant for.
+
+The pattern for anything that goes out: an agent step drafts and ends its reply
+with the exact values, an `escalation` for editorial review, then one
+`mcp_tool` step per channel.
 
 ## Lifecycle
 
