@@ -74,8 +74,12 @@ answers there; the run continues on the `approved`, `denied` or `expired`
 edge (a bare edge runs on every outcome). Config: `targetMode` (`supervisor`,
 `position` with `targetPositionId`, or `domain` with `targetDomain`),
 `escalationType` (`approval`, `decision`, `info`, `directive`), `urgency`,
-`summaryTemplate`, `expiresInMinutes`, `notifyTarget`, and optionally
-`reviewSteps`.
+`summaryTemplate`, `notifyTarget`, and optionally `reviewSteps`. An
+escalation always expires, and `urgency` sets when: critical 1 hour, high
+4 hours, normal 24 hours (the default), low 72 hours. `expiresInMinutes` is
+saved with the node but the runtime does not read it, so 0 does not mean
+"never". Wire the `expired` edge to a fallback: without one the run fails
+when the escalation expires.
 
 What the reviewer reads is what the earlier steps replied. The card opens
 with "What you are reviewing": each earlier step's reply as markdown, a link
