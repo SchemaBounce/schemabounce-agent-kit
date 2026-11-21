@@ -67,6 +67,38 @@ An `agent_action` may carry `modelOverride` (`provider`, `preferred`,
 `thinkLevel`, `maxTokensPerCall`, `maxTokenBudget`; blank fields inherit) to
 run that one step on a different model.
 
+## Approval checkpoints (`escalation`)
+
+An `escalation` node pauses the run and puts a card in the Inbox. The person
+answers there; the run continues on the `approved`, `denied` or `expired`
+edge (a bare edge runs on every outcome). Config: `targetMode` (`supervisor`,
+`position` with `targetPositionId`, or `domain` with `targetDomain`),
+`escalationType` (`approval`, `decision`, `info`, `directive`), `urgency`,
+`summaryTemplate`, `expiresInMinutes`, `notifyTarget`, and optionally
+`reviewSteps`.
+
+What the reviewer reads is what the earlier steps replied. The card opens
+with "What you are reviewing": each earlier step's reply as markdown, a link
+to the run, and every workspace file the reply links to (a console Files link
+with `?file=file_...`), readable in place. Details that decide how you build
+the steps before it:
+
+- **End the step before the escalation with the thing to review**: the draft
+  text itself, or a link to the saved file. Do not leave it in a tool call or
+  in the middle of a long reply.
+- **Name steps in plain words.** A step's node `id` is its title on the card
+  (`research_and_draft` shows as "Research and draft").
+- `reviewSteps` is a list of node ids that picks and orders the steps shown.
+  Without it, every earlier step shows, in the order they finished. At most 12
+  steps are sent, and each reply is cut at 20,000 characters (the card says
+  so). A step that is not an agent step shows its output as JSON.
+- The run's other data (earlier context, the trigger payload, an agent's
+  conversation) is not copied onto the escalation. Put what the person must
+  see in a step's reply or in `summaryTemplate` (`{{_current.field}}`,
+  `{{field}}`, `{{trigger.field}}`; an unresolvable reference becomes empty).
+- Escalations created before this behaviour keep their raw context and show
+  no review section.
+
 ## Lifecycle
 
 `draft` -> (a person approves the deploy) -> `deployed` -> `paused`.
