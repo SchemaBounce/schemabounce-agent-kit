@@ -77,6 +77,9 @@ Tasks are records of `entity_type: "tasks"` and appear on the task board.
 `adl_request_escalation` pauses your run, checkpoints it, and resumes when
 the person answers. Use it only when human judgment is genuinely needed, not
 for something a tool can find out. The org chart decides who receives it.
+The person reads `summary` and the named fields of `context_data` on the
+Inbox card, so keep `context_data` short, named and flat (see
+[references/approvals-and-secrets.md](references/approvals-and-secrets.md)).
 
 ## Waiting for something
 

@@ -52,6 +52,7 @@ Minimum shape that runs:
   `event_type`), `webhook_trigger`, `pipeline_source` (only a person deploys a
   workflow that has one).
 - **Agent and model steps**: `agent_action`, `llm_prompt`, `code_job`.
+- **Tool call, no model**: `mcp_tool` (see below).
 - **Control flow**: `condition` (`expression`), `for_each`, `sub_workflow`,
   `merge`, `delay` (`delay_seconds`; it only waits time), `escalation` (the
   approval checkpoint: the run pauses until a person responds; `targetMode`
@@ -66,6 +67,71 @@ Minimum shape that runs:
 An `agent_action` may carry `modelOverride` (`provider`, `preferred`,
 `thinkLevel`, `maxTokensPerCall`, `maxTokenBudget`; blank fields inherit) to
 run that one step on a different model.
+
+## Approval checkpoints (`escalation`)
+
+An `escalation` node pauses the run and puts a card in the Inbox. The person
+answers there; the run continues on the `approved`, `denied` or `expired`
+edge (a bare edge runs on every outcome). Config: `targetMode` (`supervisor`,
+`position` with `targetPositionId`, or `domain` with `targetDomain`),
+`escalationType` (`approval`, `decision`, `info`, `directive`), `urgency`,
+`summaryTemplate`, `notifyTarget`, and optionally `reviewSteps`. An
+escalation always expires, and `urgency` sets when: critical 1 hour, high
+4 hours, normal 24 hours (the default), low 72 hours. `expiresInMinutes` is
+saved with the node but the runtime does not read it, so 0 does not mean
+"never". Wire the `expired` edge to a fallback: without one the run fails
+when the escalation expires.
+
+What the reviewer reads is what the earlier steps replied. The card opens
+with "What you are reviewing": each earlier step's reply as markdown, a link
+to the run, and every workspace file the reply links to (a console Files link
+with `?file=file_...`), readable in place. Details that decide how you build
+the steps before it:
+
+- **End the step before the escalation with the thing to review**: the draft
+  text itself, or a link to the saved file. Do not leave it in a tool call or
+  in the middle of a long reply.
+- **Name steps in plain words.** A step's node `id` is its title on the card
+  (`research_and_draft` shows as "Research and draft").
+- `reviewSteps` is a list of node ids that picks and orders the steps shown.
+  Without it, every earlier step shows, in the order they finished. At most 12
+  steps are sent, and each reply is cut at 20,000 characters (the card says
+  so). A step that is not an agent step shows its output as JSON.
+- The run's other data (earlier context, the trigger payload, an agent's
+  conversation) is not copied onto the escalation. Put what the person must
+  see in a step's reply or in `summaryTemplate` (`{{_current.field}}`,
+  `{{field}}`, `{{trigger.field}}`; an unresolvable reference becomes empty).
+- Escalations created before this behaviour keep their raw context and show
+  no review section.
+
+## Calling a tool with no model (`mcp_tool`)
+
+`mcp_tool` calls one tool on a connected MCP server with the arguments you
+write. No model runs and no tokens are spent. Use it for the publish or send
+step after an agent drafts and a person reviews, instead of an `agent_action`
+whose prompt only says to call a tool.
+
+Config: `agentId` (the agent whose grants and approval policy the call uses;
+the agent is not woken, and the run is unattended so a personal connection is
+never used), `server`, `tool` (without the `server__` prefix), and
+`arguments`. A string in `arguments` may use `{{node_id.field}}` (any earlier
+step), `{{_current.field}}` or `{{trigger.field}}`. A string that is only one
+reference keeps its JSON type; one that does not resolve fails the step. An
+agent step's reply is its `output` field, so `{{draft.output}}`.
+
+- A tool the agent's approval policy holds, and any publish-class tool, parks
+  in Inbox > Actions with the exact arguments and the run waits. Approving
+  sends that one call once; the step's result is the tool's own result.
+  **Rejecting it fails the run**, so put an `escalation` before the call when a
+  person should choose whether to publish.
+- A tool error, a missing grant or an unreachable server fails the step.
+- A dry run resolves the agent and arguments and sends nothing.
+- Deploy blocks on an unknown `agentId` and warns on a server the agent has no
+  grant for.
+
+The pattern for anything that goes out: an agent step drafts and ends its reply
+with the exact values, an `escalation` for editorial review, then one
+`mcp_tool` step per channel.
 
 ## Lifecycle
 

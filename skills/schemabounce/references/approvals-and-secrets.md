@@ -41,6 +41,39 @@ A workspace can set standing rules ("always allow this tool for this agent")
 so routine calls stop parking. Locked actions can never get one. Only people
 set those rules.
 
+## What the person sees on an Inbox card
+
+Every card shows what is being decided on the card itself, from facts the
+server resolved. Write your side so those facts are worth reading.
+
+- **Escalation you write** (`adl_request_escalation`): the card leads with
+  your `summary` and renders `context_data` as named fields. Only short
+  scalars (cut at 300 characters), lists of up to 8 scalars and flat objects
+  of up to 6 keys show, 14 fields at most. Anything larger is counted, not
+  expanded, and credential-named keys are dropped. Put the decision in a few
+  short, flat, clearly named fields (`options`, `recommendation`, `deadline`),
+  not one large nested blob. The raw JSON sits behind a "Raw details"
+  disclosure, capped at 20,000 characters.
+- **Workflow `escalation` node**: the card opens with "What you are
+  reviewing": each earlier step's reply, a link to the run, and the workspace
+  files the reply links to, readable in place. The step before the node
+  should end its reply with the draft or a link to the saved file. See
+  [references/workflows.md](references/workflows.md).
+- **Agent proposals**: the card shows the current value beside the proposed
+  one for a model or schedule change (with the next three run times), the
+  steps of a proposed workflow, the text of a memory, profile or skill change,
+  and an "If you approve" line. Be aware that approving a `model_change`,
+  `schedule_change` or `workflow` proposal records the decision only today; it
+  does not apply it. Never tell a person the change is live because it was
+  approved: read the agent or workflow back before you say so.
+- **Pipeline proposals**: the card names the environment, source,
+  destination and sync mode that approving provisions. Approve stays disabled
+  while a prerequisite is missing, and the card says which one.
+- **Code session notices** (failed, near its budget): spend against the cap,
+  model, billing mode and credential mode, and for a failure the class, the
+  message and a next step. The tool-permission card also states billing mode
+  and credential mode.
+
 ## Secrets
 
 Credentials are workspace secrets, used by name and never shown back.
