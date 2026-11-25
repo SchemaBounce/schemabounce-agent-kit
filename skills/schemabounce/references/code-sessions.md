@@ -48,6 +48,41 @@ session slot.
 A session started from a Linear issue uses the repository mapped to the
 issue's team; leave `repo` out.
 
+## Hand work to a code session (outside)
+
+When you are a coding agent working through the hosted MCP and you need more
+workers in parallel than you can run yourself, start code sessions for the
+parts that fit instead of more local subagents. Each one runs in its own
+sandbox, on the normal billing order, and proves its work with the
+repository's own checks.
+
+A part fits when all of these hold:
+
+- It changes one repository the workspace's GitHub connection reaches, and
+  that repository's checks (its pipeline, tests, lint) can prove it.
+- It needs nothing only your machine has: a local stack or cluster, files
+  outside the repository, a browser signed in on your machine, or
+  credentials you hold.
+- No other worker is changing the same files now.
+
+Keep the work local when the proof needs your environment (deploying to and
+driving a local stack, walking a page in a browser), when it is a handful of
+tool calls, or when it changes CI workflow files the repository's GitHub app
+is not allowed to push.
+
+1. Write the prompt as a brief: the goal, what done means as a check that can
+   fail, the files or area it owns, and what it must not touch. Use
+   `session_type` `read_only` for an investigation that changes nothing.
+2. `sb_code_session` `create`. Billing follows the order in Who pays below.
+3. Await it with `wait`, which returns when the session finishes or needs a
+   person; keep working meanwhile. A session that comes back `queued` starts
+   on its own, so never start a second one for the same work.
+4. What it waits on (a plan, a tool approval, a held review, a push) is a
+   person's decision in the Inbox. Tell them; never answer it for them.
+5. Report from `summary`: the outcome, the landed commit or pull request, the
+   checks, the review verdict and the cost, as returned. Read its `diff`
+   before you build on its work.
+
 ## Who pays
 
 A session runs on a coding subscription whenever one is available: the

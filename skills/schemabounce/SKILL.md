@@ -73,7 +73,7 @@ are not allowed to make fails with the reason.
 | Approvals, external actions, publishing, secrets, outbound HTTP | [references/approvals-and-secrets.md](references/approvals-and-secrets.md) |
 | Connected MCP servers, built-in calculation tools, marketplace, public skills | [references/connections-and-tools.md](references/connections-and-tools.md) |
 | Findings, reports, briefings and monitoring conventions | [references/reporting.md](references/reporting.md) |
-| Code sessions and repositories | [references/code-sessions.md](references/code-sessions.md) |
+| Code sessions and repositories, and handing parallel work to them | [references/code-sessions.md](references/code-sessions.md) |
 | Goals, key results and outcome metrics | [references/goals.md](references/goals.md), then [references/goals-measuring.md](references/goals-measuring.md) |
 | Decision records (dec-NNN): find, cite, propose | [references/decisions.md](references/decisions.md), [references/decisions-proposing.md](references/decisions-proposing.md), [references/decisions-record-fields.md](references/decisions-record-fields.md) |
 | Console pages, docs, what needs attention, reporting a platform bug | [references/console-and-docs.md](references/console-and-docs.md) |
