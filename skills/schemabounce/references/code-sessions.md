@@ -83,6 +83,29 @@ is not allowed to push.
    checks, the review verdict and the cost, as returned. Read its `diff`
    before you build on its work.
 
+## Continue on your computer, and back
+
+Out: `sb_code_session` `handoff` (`session_id`) returns the repository, the
+work branch and whether it is on GitHub, the engine and its session id, the
+download path of the one transcript file, and the exact commands. A branch
+that is not on GitHub yet is pushed first with `push` (it needs a person's
+typed phrase). Then, on the machine: `git fetch origin <branch> && git switch
+<branch>`, put the transcript at `~/.claude/projects/<project dir>/<id>.jsonl`
+(the project dir is the repository's absolute path with every character that
+is not a letter or digit turned into `-`), and run `claude --resume <id>`;
+for Codex the rollout file goes under `~/.codex/sessions/<yyyy>/<mm>/<dd>/`
+and the command is `codex resume <id>`. Only the conversation file is
+exported, never the engine's settings or credentials. Download it with your
+SchemaBounce credential; the route is audited.
+
+In: `transcript_upload` returns an `upload_id` and a `put_url` (15 minutes).
+PUT your local Claude Code session file (`~/.claude/projects/<project>/<id>.jsonl`,
+at most 20 MB, one JSON object per line) to it, push your local branch, then
+`create` with `transcript_upload_id` and `base_branch` set to that branch.
+The session resumes the conversation. Claude Code only; Codex transcripts are
+not supported yet. Never print or paste a transcript into a chat or a log:
+it is conversation content.
+
 ## Who pays
 
 A session runs on a coding subscription whenever one is available: the
@@ -109,7 +132,8 @@ exists only in the checkpoint needs `continue` instead.
 ## Outside
 
 `sb_code_session`: `create`, `status`, `context`, `events`, `diff`,
-`result`, `push` and `cancel` (each asks for a typed confirmation phrase),
+`result`, `summary`, `wait` (bounded: default 45 seconds, at most 270; call
+it again while it says `still_running`), `handoff`, `transcript_upload`, `push` and `cancel` (each asks for a typed confirmation phrase),
 `interrupt` (stop the current turn, keep the session), `pause`, `resume`,
 `continue`, `rerun` (a second rerun while one is open returns that one),
 `publish` (open the pull request from the pushed branch, no model cost),
